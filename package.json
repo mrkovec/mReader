@@ -1,0 +1,21 @@
+{
+	"name": "mReader",
+	"productName": "mReader",
+	"version": "0.1.0",
+	"description": "Open source comics/ebook reader",
+	"license": "MIT",
+	"files": ["src/app/client/index.html"],
+	"main": "./src/app/init.js",
+	"dependencies": {
+		"babel-preset-es2015": "*",
+		"babel-preset-react": "*",
+		"babel-register": "*",
+		"babel-plugin-transform-object-rest-spread":  "*",
+		"react": "^0.14.0",
+		"react-dom": "^0.14.0",
+		"material-ui": "0.15.0-alpha.2",
+		"react-tap-event-plugin": "^0.2.0",
+		"node-7z": "*",
+		"xml2js": "*"
+  }
+}
