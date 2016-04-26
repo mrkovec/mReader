@@ -1,10 +1,9 @@
 import React from 'react'
 import Bar from './bar'
 import Lib from './lib'
-import {Book, lazyLoadImages} from './book'
+import Ebook from './ebook'
 
-import LinearProgress from 'material-ui/lib/linear-progress'
-import Snackbar from 'material-ui/lib/snackbar'
+import Book from './../book'
 
 export default class App extends React.Component {
   constructor (props) {
@@ -12,26 +11,11 @@ export default class App extends React.Component {
     this.state = {readState: 'unread',
                   bookType: 'all',
                   search: '',
-                  // loading: false,
                   view: 'library',
                   groupByName: false
     }
-    // this.handleBarChange = this.handleBarChange.bind(this)
     this.handleAppChange = this.handleAppChange.bind(this)
-    this.setLoading = this.setLoading.bind(this)
-    this.snackbarMessage = this.snackbarMessage.bind(this)
-
   }
-
-  /*handleBarChange (changed) {
-    let {filter, search} = changed
-    if (filter) {
-      this.setState({filter: filter})
-    }
-    if (search) {
-      this.setState({search: search})
-    }
-  }*/
 
   handleAppChange (changed) {
     let {readState, bookType, search, view, groupByName} = changed
@@ -51,87 +35,31 @@ export default class App extends React.Component {
       this.setState({groupByName: groupByName})
     }
   }
-  snackbarMessage(msg) {
-
-    if (this.snackRef) {
-      console.log(msg)
-      this.snackRef.handleMessage(msg)
-    }
-  }
-
-  setLoading (state) {
-    this.setState({loading: state})
-  }
 
   render () {
-    let {library, book, ...other} = this.props
-    if (book != null & this.state.view === 'book') {
-      window.addEventListener('resize', lazyLoadImages)
-      window.addEventListener('scroll', lazyLoadImages)
-      return (
-        <div className='appContainer'>
-          <Book book={book} onAppChange = {this.handleAppChange} onSnackMessage = {this.snackbarMessage}/>
-          <Snack ref={(ref) => this.snackRef = ref} />
-        </div>
-      )
-    }
+    let {library, book} = this.props
 
-    window.removeEventListener('resize', lazyLoadImages)
-    window.removeEventListener('scroll', lazyLoadImages)
-    let {readState, bookType} = this.state
+    if (book != null & this.state.view === 'book') {
+      switch (book.type) {
+        case 'ebook':
+          return (
+          <div className='appContainer'>
+            <Ebook book={book} onAppChange = {this.handleAppChange}/>
+          </div>
+          )
+        default:
+      }
+    }
     return (
       <div className='appContainer'>
-        <Bar settings={this.state} onAppChange = {this.handleAppChange} ref={(ref) => this.barRef = ref} />
-
+        <Bar settings={this.state} onAppChange = {this.handleAppChange} />
         <Lib library = {library} settings={this.state} />
-        <Snack ref={(ref) => this.snackRef = ref} />
       </div>
     )
   }
 }
-// {this.state.loading ? <LinearProgress /> : ''}
-class Snack extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      open: false,
-      message: ''
-    }
-    this.lastInfo = ''
-    this.handleRequestClose = this.handleRequestClose.bind(this)
-    this.handleMessage = this.handleMessage.bind(this)
-    console.log('snack constructor')
-  }
 
-  handleRequestClose () {
-    this.setState({
-      open: false
-    })
-  }
-  handleMessage (msg) {
-    console.log('handleMessage ' + msg)
-    if (this.state.open) {
-      setTimeout(() => {
-        this.setState({
-          message: msg
-        })
-      }, 1000)
-    } else {
-      this.setState({
-        open: true,
-        message: msg
-      })
-    }
-  }
-
-  render () {
-    return (
-        <Snackbar
-          open={this.state.open}
-          message={this.state.message}
-          autoHideDuration={2000}
-          onRequestClose={this.handleRequestClose}
-        />
-    )
-  }
+App.propTypes = {
+  library: React.PropTypes.array.isRequired,
+  book: React.PropTypes.instanceOf(Book)
 }

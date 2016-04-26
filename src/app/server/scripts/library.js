@@ -1,251 +1,115 @@
 'use strict'
-// import App from 'app'
-import Fs from 'fs'
+
 import Path from 'path'
+import Fs from 'fs'
 
-// import ParseComics from './comics.js'
-import {ParseComics} from './comics'
-import {ParseBook} from './ebook'
+import {TempPath, AppPath, ComicExt, BookExt} from './../../conf'
+import {ReadFile, ListFiles, DeleteFile, ExistsFile, ExtractFromArchive} from './util'
+import {ParseEbook, OpenEbook} from './ebook'
 
-import {AppPath, BookExt, ComicsExt} from './../../conf'
-const libPath = Path.join(AppPath, 'lib.json')
-
-export function AddSyncLibrary (path) {
-  return AddLibrary(path).then(() => {
-    return SyncLibrary()
-  })
-}
-
-export function AddLibrary (path) {
-  return readLibrary(libPath).then((lib) => {
-    if (!lib.includes(path)) {
-      lib = lib.concat(path)
+export class Book {
+  constructor (data) {
+    if (data) {
+      let {type, name, author, issue, libpath, relpath, file, body, info} = data
+      this.type = type
+      this.name = name
+      this.author = author
+      this.issue = issue
+      this.libpath = libpath
+      this.relpath = relpath
+      this.file = file
+      this.body = body
+      this.info = info
     }
-    return writeLibrary(lib, libPath)
-  })
-}
-
-
-/* export function ReadLibrary (oldlib) {
-  return readLibrary(libPath).then((lib) => {
-    if (oldlib) {
-      oldlib.forEach((book) => {
-        try {
-          Fs.statSync(book.file)
-        } catch (err) {
-          book.img.forEach((imgfile) => {
-            try {
-              Fs.unlinkSync(`${imgfile}`)
-            } catch (err) {
-              console.log(err)
-            }
-          })
-        }
-      })
-    }
-    return new Promise((resolve, reject) => {
-      let library = []
-      lib.forEach((dir) => {
-        dir = Path.normalize(dir)
-        try {
-          let files = getFiles(dir)
-        /*  let files = getFiles(dir).filter((file) => {
-            return !exbooks.includes(file)
-          })
-          console.log('files')
-          console.log(files)*/
-          /* library = library.concat(ParseComicsSync(dir, files))
-        } catch (err) {
-          reject(err)
-        }
-      })
-      resolve(library)
-    })
-  })
-}*/
-
-export function SyncLibrary () {
-  return readLibrary().then((lib) => {
-    let promises = lib.map((dir) => {
-      let files = getFiles(dir)
-      return ParseComics(dir, files).then((comics) => {
-        return ParseBook(dir, files).then((books) => {
-          books = comics.concat(books)
-          // console.log(book)
-          return books
-        })
-      })
-    })
-    return Promise.all(promises)
-  })
-}
-
-
-
-/*
-export default class ReaderLibrary {
-  constructor (onReply) {
-    this.replyHandler = onReply
-    this.data = null
   }
 
-  sync (requester) {
-    readLibrary(libPath).then((resp) => {
-      resp = resp.filter((book) => {
-        let p = Path.join(book.libpath, book.relpath, book.file)
+  get fullPath () {
+    return Path.join(this.libpath, this.relpath, this.file)
+  }
+  get dataPath () {
+    return Path.join(TempPath, Path.basename(this.file))
+  }
+
+  parse (dir, file) {
+    dir = Path.normalize(dir)
+    file = Path.normalize(file)
+
+    this.type = 'x'
+    if (ComicExt.indexOf(Path.extname(file)) >= 0) {
+      this.type = 'comics'
+    }
+    if (BookExt.indexOf(Path.extname(file)) >= 0) {
+      this.type = 'ebook'
+    }
+    this.name = Path.basename(file)
+    this.author = ''
+    this.issue = ''
+    this.libpath = dir
+    this.relpath = Path.dirname(Path.relative(dir, file))
+    this.file = this.name
+    this.body = []
+
+    switch (this.type) {
+      case 'ebook':
+        return ParseEbook(this)
+      case 'comics':
+        return 'ok'
+      default:
+        throw new Error('unknown book type')
+    }
+  }
+
+  clear () {
+    // let tmpdir = Path.join(TempPath, Path.basename(this.file))
+    return ExistsFile(this.dataPath).then(() => {
+      return Promise.all(ListFiles(this.dataPath, null, (f) => { return Path.basename(f) !== 'nfo.json' }).map((file) => {
+        return DeleteFile(file)
+      }))
+    }).catch(() => { return 'ok' })
+  }
+
+  open () {
+    let book = this
+    return new Promise(function (resolve, reject) {
+      if (book.body.some((p) => {
         try {
           Fs.statSync(p)
         } catch (err) {
-          return false
+          return true
         }
-        return true
+      })) {
+        resolve(ExtractFromArchive(book.fullPath, '*.*', 'x'))
+      }
+      resolve('ok')
+    }).then(() => {
+      return OpenEbook(this)
+    })
+  }
+
+}
+
+export function ClearLibrary () {
+  return ReadFile(Path.join(AppPath, 'lib.json')).then((libs) => {
+    return Promise.all(JSON.parse(libs).map((libdir) => {
+      return Promise.all(ListFiles(libdir).map((file) => {
+        return (new Book({file: file})).clear()
+      }))
+    }))
+  })
+}
+
+export function SyncLibrary () {
+  let allbooks = []
+  return ReadFile(Path.join(AppPath, 'lib.json')).then((libs) => {
+    return Promise.all(JSON.parse(libs).map((libdir) => {
+      return Promise.all(ListFiles(libdir, null, (f) => { return `${BookExt}`.indexOf(Path.extname(f)) >= 0 }).map((file) => {
+        return (new Book()).parse(libdir, file)
+      }))
+    })).then((books) => {
+      books.forEach((b) => {
+        allbooks = allbooks.concat(b)
       })
-      return resp
-    }).then((resp) => {
-      let libs = new Map()
-      resp = resp.forEach((book) => {
-        if (!libs.has(book.libpath)) {
-          libs.set(book.libpath)
-        }
-      })
-      this.data = null
-      for (let libpath of libs.keys()) {
-        this.add(requester, libpath)
-      }
-    }).catch((err) => {
-      this.replyHandler(requester, requester, {error: err})
+      return allbooks
     })
-  }
-
-  add (requester, path) {
-    getBooks(path).then((lib) => {
-      if (lib.length > 0) {
-        if (!this.data) {
-          this.data = []
-        }
-        this.data = this.data.concat(lib)
-        this.replyHandler(requester, {library: this.data, info: `${lib.length} books added susesfully`})
-        this.save(requester)
-      } else {
-        this.replyHandler(requester, {error: 'no books to be added'})
-      }
-    })
-  }
-
-  save (requester) {
-    writeLibrary(this.data, libPath).then(() => {
-      this.replyHandler(requester, {info: 'library sucesfully saved'})
-    }, (err) => {
-      this.replyHandler(requester, {error: err})
-    })
-  }
-
-  read (requester) {
-    readLibrary(libPath).then((resp) => {
-      this.data = resp
-      this.replyHandler(requester, {library: this.data, info: `library sucesfully read (${this.data.lengtg}) books`})
-    }, function (err) {
-      this.replyHandler(requester, {error: err})
-    })
-  }
-}
-
-function getBooks (dir) {
-  return new Promise((resolve) => {
-    dir = Path.normalize(dir)
-    let library = getFiles(dir)
-    resolve(ParseComics(dir, library))
-  })
-}
-*/
-
-export function ExistsFile (path) {
-  return new Promise(function (resolve, reject) {
-    Fs.stat(path, (err, stats) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(stats)
-      }
-    })
-  })
-}
-
-export function ReadFile (path) {
-  return new Promise(function (resolve, reject) {
-    Fs.readFile(path, 'utf8', (err, data) => {
-      if (err) {
-        if (err.code === 'ENOENT') {
-          resolve(null)
-        } else {
-          reject(err)
-        }
-      } else {
-        resolve(data)
-      }
-    })
-  })
-}
-
-export function WriteFile (path, data) {
-  return new Promise((resolve, reject) => {
-    Fs.writeFile(path, JSON.stringify(data), 'utf8', 'w', (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
-  })
-}
-
-function readLibrary () {
-  return new Promise(function (resolve, reject) {
-    Fs.readFile(libPath, 'utf8', (err, data) => {
-      if (err) {
-        if (err.code === 'ENOENT') {
-          resolve([])
-        } else {
-          reject(err)
-        }
-      } else {
-        resolve(JSON.parse(data))
-      }
-    })
-  })
-}
-
-function writeLibrary (library, path) {
-  return new Promise((resolve, reject) => {
-    Fs.writeFile(path, JSON.stringify(library), 'utf8', 'w', (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
-  })
-}
-
-function getFiles (dir, files_) {
-  dir = Path.normalize(dir)
-  files_ = files_ || []
-  let files = Fs.readdirSync(dir)
-  for (var i in files) {
-    let name = dir + '/' + files[i]
-    if (Fs.statSync(name).isDirectory()) {
-      getFiles(name, files_)
-    } else if (Fs.statSync(name).isFile() & `${BookExt}${ComicsExt}`.indexOf(Path.extname(name)) >= 0) {
-      files_.push(name)
-    }
-  }
-  return files_
-}
-
-function uuid4 () {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    let r = Math.random() * 16 | 0
-    let v = c === 'x' ? r : (r & 0x3 | 0x8)
-    return v.toString(16)
   })
 }

@@ -1,68 +1,93 @@
+'use strict'
+
 import Path from 'path'
-import exec from 'child_process'
-import xml2js from 'xml2js'
 
-import {ReadFile} from './library'
-import {ExtractCover} from './comics'
-import {TempPath, BookExt} from './../../conf'
+import {TempPath} from './../../conf'
+import {ListFromArchive, ExtractFromArchive, ReadFile, ParseXML, ExistsFile, WriteFile} from './util'
 
-export function ParseBook (dir, files) {
-  let promises = files.map((file) => {
-    let book = Path.basename(file)
-    if (`${BookExt}`.indexOf(Path.extname(book)) >= 0) {
-      file = Path.normalize(file)
-      let ebook = {type: 'ebook', name: book, author: '', libpath: dir, relpath: Path.dirname(Path.relative(dir, file)), file: book}
-      return listBook(file).then((ob) => {
-        let opf = {}
-        let html = ob.map((file) => {
-          if (Path.basename(file) === 'content.opf') {
-            opf = file
-          } else {
-            return file
-          }
-        })
-        ebook.html = html.sort()
-        return ReadFile(opf).then((xml) => {
-          return parseBook(xml, ebook)
-        })
-        // return ebook
+// const head_rx = /<title>(.*?)<\/title>/gi
+const title_rx = /<title[^>]*>((.|[\n\r])*)<\/title>/im
+const body_rx = /<body[^>]*>((.|[\n\r])*)<\/body>/im
+const head_rx = /<head[^>]*>((.|[\n\r])*)<\/head>/im
+
+export function OpenEbook (book) {
+  let indexPromises = book.body.map((htmlfile, i) => {
+    return ReadFile(htmlfile).then((html) => {
+      let title = html.match(title_rx).map((a) => {
+        return a.replace(/<\/?title>/g, '')
       })
-    }
-  })
-  return Promise.all(promises)
-}
+      // return ParseXML(head, false).then((data) => {
+      //   let css = data.head.link.filter((link) => {
+      //     return link['$'].type === 'text/css'
+      //   }).map((link) => {
+      //     return link['$'].href
+      //   })
+      //
+      //   console.log(css)
+        let kap = {}
+        kap.i = i
+        kap.title = title[0]
+        let body = html.match(body_rx).map((a) => {
+          return a.replace(/<\/?body>/ig, '')
+        })
+        kap.text = body[0].replace(/<img[^>]*>/g, '')
+        return kap
+      // })
 
-function parseBook (xml, ebook) {
-  return new Promise(function (resolve, reject) {
-    let parser = new xml2js.Parser({ignoreAttrs: true})
-    parser.addListener('end', function (result) {
-        // console.dir(result.package.metadata[0])
-      ebook.name = result.package.metadata[0]['dc:title'][0]
-      ebook.author = result.package.metadata[0]['dc:creator'][0]
-      resolve(ebook)
+
+      // return ParseXML(html, true).then((data) => {
+      //   let kap = {}
+      //   kap.i = i
+      //   kap.title = data.html.head[0].title[0]
+      //   kap.text = data.html.body[0]
+      //   return kap
+      // })
     })
-    parser.parseString(xml)
+  })
+  return Promise.all(indexPromises).then((kaps) => {
+    let allkaps = []
+    kaps.forEach((k) => {
+      allkaps = allkaps.concat(k)
+    })
+    allkaps.sort((a, b) => {
+      return a.i - b.i
+    })
+    book.kap = allkaps
+    return book
   })
 }
 
-function listBook (file) {
-  return new Promise(function (resolve, reject) {
-    let regex = /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) ([\.D][\.R][\.H][\.S][\.A]) +(\d+) +(\d+)? +(.+)/
-    let imgs = []
-    // exec.exec(`7z l "${file}" -r -i!content.opf`, {encoding: 'utf8'}, (error, stdout, stderr) => {
-    exec.exec(`7z l "${file}" -r -i!content.opf -i!*.html -i!*.xhtml`, {encoding: 'utf8'}, (error, stdout, stderr) => {
-      if (error) {
-        console.log(error)
-        reject(error)
-      }
-      stdout.split('\n').forEach((line) => {
-        let info = line.match(regex)
-        if (info) {
-          imgs = imgs.concat(Path.join(TempPath, Path.basename(file), Path.basename(info[5])))
-        }
+export function ParseEbook (book) {
+  // return ListFromArchive(book.fullPath, '-i!content.opf -i!*.html -i!*.xhtml').then((files) => {
+  return ListFromArchive(book.fullPath, '-i!content.opf').then((files) => {
+    let opf = files[0]
+    return ExtractFromArchive(book.fullPath, Path.basename(opf), 'x').then(() => {
+      return ReadFile(opf).then((xml) => {
+        return ParseXML(xml, false).then((data) => {
+          book.name = data.package.metadata[0]['dc:title'][0]
+          book.author = data.package.metadata[0]['dc:creator'][0]['_']
+          book.body = data.package.manifest[0].item.filter((item) => {
+            if (item['$']['media-type'] === 'application/xhtml+xml') {
+              return true
+            }
+            return false
+          }).map((item) => {
+            return Path.join(Path.dirname(opf), item['$']['href'])
+          })
+          let infofile = Path.join(TempPath, Path.basename(book.file), 'nfo.json')
+          return ExistsFile(infofile).catch(() => {
+            book.info = {added: (new Date()), lastReadPage: 1}
+            return WriteFile(infofile, JSON.stringify(book.info)).then(() => {
+              return book
+            })
+          }).then(() => {
+            return ReadFile(infofile).then((info) => {
+              book.info = JSON.parse(info)
+              return book
+            })
+          })
+        })
       })
-      // console.log(imgs.sort())
-      resolve(imgs.sort())
     })
   })
 }
