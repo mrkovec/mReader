@@ -7,8 +7,11 @@ import xml2js from 'xml2js'
 import {TempPath} from './../../conf'
 
 export function PrintErr (err, source) {
-  console.log(`${source ? source : ''}${source ? ' => ' : ''}${err.fileName}(${err.lineNumber}/${err.columnNumber})`)
-  console.log(err.stack)
+  if (source) {
+    console.error(source)
+  }
+  // console.log(`${source ? source : ''}${source ? ' => ' : ''}${err.fileName}(${err.lineNumber}/${err.columnNumber})`)
+  console.error(err.stack)
 }
 
 export function ParseXML (xml, iattr = true) {

@@ -6,6 +6,7 @@ import Fs from 'fs'
 import {TempPath, AppPath, ComicExt, BookExt} from './../../conf'
 import {ReadFile, ListFiles, DeleteFile, ExistsFile, ExtractFromArchive} from './util'
 import {ParseEbook, OpenEbook} from './ebook'
+import {ParseComics, OpenComics} from './comics'
 
 export class Book {
   constructor (data) {
@@ -53,7 +54,7 @@ export class Book {
       case 'ebook':
         return ParseEbook(this)
       case 'comics':
-        return 'ok'
+        return ParseComics(this)
       default:
         throw new Error('unknown book type')
     }
@@ -82,7 +83,14 @@ export class Book {
       }
       resolve('ok')
     }).then(() => {
-      return OpenEbook(this)
+      switch (this.type) {
+        case 'ebook':
+          return OpenEbook(this)
+        case 'comics':
+          return book// OpenComics(this)
+        default:
+          throw new Error('unknown book type')
+      }
     })
   }
 
@@ -102,7 +110,7 @@ export function SyncLibrary () {
   let allbooks = []
   return ReadFile(Path.join(AppPath, 'lib.json')).then((libs) => {
     return Promise.all(JSON.parse(libs).map((libdir) => {
-      return Promise.all(ListFiles(libdir, null, (f) => { return `${BookExt}`.indexOf(Path.extname(f)) >= 0 }).map((file) => {
+      return Promise.all(ListFiles(libdir, null, (f) => { return `${BookExt}${ComicExt}`.indexOf(Path.extname(f)) >= 0 }).map((file) => {
         return (new Book()).parse(libdir, file)
       }))
     })).then((books) => {

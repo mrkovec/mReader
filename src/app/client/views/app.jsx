@@ -2,6 +2,7 @@ import React from 'react'
 import Bar from './bar'
 import Lib from './lib'
 import Ebook from './ebook'
+import Comics from './comics'
 
 import Book from './../book'
 
@@ -43,9 +44,15 @@ export default class App extends React.Component {
       switch (book.type) {
         case 'ebook':
           return (
-          <div className='appContainer'>
-            <Ebook book={book} onAppChange = {this.handleAppChange}/>
-          </div>
+            <div className='appContainer'>
+              <Ebook book={book} onAppChange = {this.handleAppChange}/>
+            </div>
+          )
+        case 'comics':
+          return (
+            <div className='appContainer'>
+              <Comics book={book} onAppChange = {this.handleAppChange}/>
+            </div>
           )
         default:
       }

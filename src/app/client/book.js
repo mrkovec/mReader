@@ -20,9 +20,9 @@ export default class Book {
   get fname () {
     switch (this.type) {
       case 'ebook':
-        return this.author
-      case 'comics':
         return this.name
+      case 'comics':
+        return this.issue
       default:
         return 'unknown book'
     }
@@ -31,9 +31,9 @@ export default class Book {
   get sname () {
     switch (this.type) {
       case 'ebook':
-        return this.name
+        return this.author
       case 'comics':
-        return this.issue
+        return this.name
       default:
         return 'unknown book'
     }

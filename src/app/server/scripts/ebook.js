@@ -8,40 +8,34 @@ import {ListFromArchive, ExtractFromArchive, ReadFile, ParseXML, ExistsFile, Wri
 // const head_rx = /<title>(.*?)<\/title>/gi
 const title_rx = /<title[^>]*>((.|[\n\r])*)<\/title>/im
 const body_rx = /<body[^>]*>((.|[\n\r])*)<\/body>/im
-const head_rx = /<head[^>]*>((.|[\n\r])*)<\/head>/im
+// const head_rx = /<head[^>]*>((.|[\n\r])*)<\/head>/im
+// const img_rx = /<img[^>]+src="?([^"\s]+)"?\s*\/>/g
+// const link_rx = /<link[^>]*((.)*)\/>/gi
+// const href_rx = /href="(.*)"/g
 
 export function OpenEbook (book) {
   let indexPromises = book.body.map((htmlfile, i) => {
     return ReadFile(htmlfile).then((html) => {
-      let title = html.match(title_rx).map((a) => {
-        return a.replace(/<\/?title>/g, '')
-      })
-      // return ParseXML(head, false).then((data) => {
-      //   let css = data.head.link.filter((link) => {
-      //     return link['$'].type === 'text/css'
-      //   }).map((link) => {
-      //     return link['$'].href
-      //   })
-      //
-      //   console.log(css)
-        let kap = {}
-        kap.i = i
+      let kap = {}
+      kap.i = i
+      let title = html.match(title_rx)
+      if (title) {
+        title = title.map((a) => {
+          if (a) {
+            return a.replace(/<\/?title>/g, '')
+          }
+          return ''
+        })
         kap.title = title[0]
-        let body = html.match(body_rx).map((a) => {
+      }
+      let body = html.match(body_rx)
+      if (body) {
+        body = body.map((a) => {
           return a.replace(/<\/?body>/ig, '')
         })
-        kap.text = body[0].replace(/<img[^>]*>/g, '')
-        return kap
-      // })
-
-
-      // return ParseXML(html, true).then((data) => {
-      //   let kap = {}
-      //   kap.i = i
-      //   kap.title = data.html.head[0].title[0]
-      //   kap.text = data.html.body[0]
-      //   return kap
-      // })
+        kap.text = body[0] // .replace(/<img[^>]*>/g, '')
+      }
+      return kap
     })
   })
   return Promise.all(indexPromises).then((kaps) => {
@@ -49,6 +43,12 @@ export function OpenEbook (book) {
     kaps.forEach((k) => {
       allkaps = allkaps.concat(k)
     })
+    // allkaps = allkaps.filter((k, i, arr) => {
+    //   if (i === 0) {
+    //     return true
+    //   }
+    //
+    // })
     allkaps.sort((a, b) => {
       return a.i - b.i
     })
