@@ -14,6 +14,7 @@ export default class Book {
       this.body = body
       this.info = info
       this.kap = kap
+      console.log(this.info)
     }
   }
 
@@ -21,7 +22,7 @@ export default class Book {
     switch (this.type) {
       case 'ebook':
         return this.name
-      case 'comics':
+      case 'comic':
         return this.issue
       default:
         return 'unknown book'
@@ -32,7 +33,7 @@ export default class Book {
     switch (this.type) {
       case 'ebook':
         return this.author
-      case 'comics':
+      case 'comic':
         return this.name
       default:
         return 'unknown book'

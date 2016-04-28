@@ -74,17 +74,17 @@ export function ParseEbook (book) {
           }).map((item) => {
             return Path.join(Path.dirname(opf), item['$']['href'])
           })
-          let infofile = Path.join(TempPath, Path.basename(book.file), 'nfo.json')
-          return ExistsFile(infofile).catch(() => {
-            book.info = {added: (new Date()), lastReadPage: 1}
-            return WriteFile(infofile, JSON.stringify(book.info)).then(() => {
+          return book.getInfo().then((info) => {
+            if (info) {
+              book.bookInfo = info
               return book
-            })
-          }).then(() => {
-            return ReadFile(infofile).then((info) => {
-              book.info = JSON.parse(info)
-              return book
-            })
+            }
+            book.bookInfo = {added: (new Date()), readOffset: 0}
+            return book
+            // book.info = info
+            // return book.setInfo(info).then(() => {
+            //   return book
+            // })
           })
         })
       })

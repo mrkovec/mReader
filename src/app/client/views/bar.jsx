@@ -59,7 +59,7 @@ export default class Bar extends React.Component {
            <DropDownMenu value={bookType} onChange={this.handleBookTypeChange}>
              <MenuItem value={'all'} primaryText='All' />
              <MenuItem value={'ebook'} primaryText='Books' />
-             <MenuItem value={'comics'} primaryText='Comics' />
+             <MenuItem value={'comic'} primaryText='Comic' />
            </DropDownMenu>
          </ToolbarGroup>
 

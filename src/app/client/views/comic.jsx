@@ -1,15 +1,17 @@
 import React from 'react'
-import Book from './../book'
-
+import IpcRenderer from 'ipc-renderer'
+import Book from './../scripts/book'
 import IconButton from 'material-ui/lib/icon-button'
 import ActionHome from 'material-ui/lib/svg-icons/action/home'
 
-export default class Comics extends React.Component {
+export default class Comic extends React.Component {
   constructor (props) {
     super(props)
     this.onBack = this.onBack.bind(this)
   }
   onBack () {
+    let poff = 100 * (document.body.scrollTop / document.body.scrollHeight)
+    IpcRenderer.send('readOffset', {offset: poff, file: this.props.book.file})
     this.props.onAppChange({view: 'library'})
   }
   render () {
@@ -34,7 +36,7 @@ export default class Comics extends React.Component {
     )
   }
 }
-Comics.propTypes = {
+Comic.propTypes = {
   onAppChange: React.PropTypes.func.isRequired,
   book: React.PropTypes.instanceOf(Book)
 

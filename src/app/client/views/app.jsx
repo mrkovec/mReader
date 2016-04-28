@@ -2,9 +2,9 @@ import React from 'react'
 import Bar from './bar'
 import Lib from './lib'
 import Ebook from './ebook'
-import Comics from './comics'
+import Comic from './comic'
 
-import Book from './../book'
+import Book from './../scripts/book'
 
 export default class App extends React.Component {
   constructor (props) {
@@ -48,10 +48,10 @@ export default class App extends React.Component {
               <Ebook book={book} onAppChange = {this.handleAppChange}/>
             </div>
           )
-        case 'comics':
+        case 'comic':
           return (
             <div className='appContainer'>
-              <Comics book={book} onAppChange = {this.handleAppChange}/>
+              <Comic book={book} onAppChange = {this.handleAppChange}/>
             </div>
           )
         default:

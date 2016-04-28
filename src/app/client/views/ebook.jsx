@@ -1,7 +1,7 @@
 import React from 'react'
-// import IpcRenderer from 'ipc-renderer'
+import IpcRenderer from 'ipc-renderer'
 import Path from 'path'
-import Book from './../book'
+import Book from './../scripts/book'
 
 import IconButton from 'material-ui/lib/icon-button'
 import ActionHome from 'material-ui/lib/svg-icons/action/home'
@@ -17,27 +17,28 @@ export default class Ebook extends React.Component {
   }
 
   onBack () {
-    // IpcRenderer.send('lastPage', {page: actPage, file: this.props.book.file})
+    let poff = 100 * (document.body.scrollTop / document.body.scrollHeight)
+    IpcRenderer.send('readOffset', {offset: poff, file: this.props.book.file})
     this.props.onAppChange({view: 'library'})
   }
 
   render () {
     let {book} = this.props
     let index = book.kap.map((k, i, arr) => {
-      let kaptxt = `Chapter ${i + 1}`
-      if (k.title) {
-        if (i > 0) {
-          if (strip(k.title) === strip(arr[i - 1].title)) {
-            kaptxt = k.title
-          }
-        } else {
-          kaptxt = k.title
-        }
-      }
-      return (<li><a href={`#${i + 1}`} >{kaptxt}</a></li>)
+      // let kaptxt = `Chapter ${i + 1}`
+      // if (k.title) {
+      //   if (i > 0) {
+      //     if (strip(k.title) !== strip(arr[i - 1].title)) {
+      //       kaptxt = k.title
+      //     }
+      //   } else {
+      //     kaptxt = k.title
+      //   }
+      // }
+      return (<li><a href={`#${i + 1}`} >{k.title}</a></li>)
     })
     let pages = book.kap.map((k, i) => {
-      return (<Page key={i} src={`<h1>${k.title}</h1>${k.text}`} head={k.head} root={book.body[i]} pgn={i + 1} />)
+      return (<Page key={i} src={`${k.text}`} head={k.head} root={book.body[i]} pgn={i + 1} />)
     })
     return (
       <div className='bookContainer'>
@@ -51,7 +52,9 @@ export default class Ebook extends React.Component {
             <ActionHome />
           </IconButton>
         </div>
-        <ol>{index}</ol>
+        <h1>{book.fname}</h1>
+        <h2>{book.sname}</h2>
+        <div><ol>{index}</ol></div>
         {pages}
       </div>
     )
@@ -109,6 +112,7 @@ class Page extends React.Component {
   }
 
   render () {
+    // window.addEventListener('scroll', cekPos)
     return (
       <div className='pageContainer' id={`${this.props.pgn}`} ref={(ref) => this.refParent = ref}>
         <div ref={(ref) => this.ref = ref} />
@@ -122,15 +126,27 @@ Page.propTypes = {
   root: React.PropTypes.string.isRequired
 }
 
-function strip (html) {
-  let tmp = document.createElement('DIV')
-  try {
-    tmp.innerHTML = html
-  } catch (err) {
-    console.log(err)
-  }
-  return tmp.textContent || tmp.innerText || ''
-}
+// function cekPos () {
+//   let body = document.body
+//   let html = document.documentElement
+//
+//   // console.log('body.scrollHeight ' + body.scrollHeight)
+//   // console.log('window.innerHeight ' + window.innerHeight)
+//   // console.log('body.scrollTop ' + body.scrollTop)
+//   console.log('body.scrollBottom ' + (body.scrollTop + window.innerHeight))
+//   // console.log('html.clientHeight ' + html.clientHeight)
+//   console.log('window.innerHeight ' + window.innerHeight)
+// }
+
+// function strip (html) {
+//   let tmp = document.createElement('DIV')
+//   try {
+//     tmp.innerHTML = html
+//   } catch (err) {
+//     console.log(err)
+//   }
+//   return tmp.textContent || tmp.innerText || ''
+// }
 // function rulesForCssText (styleContent) {
 //   let doc = document.implementation.createHTMLDocument('')
 //   let styleElement = document.createElement('style')

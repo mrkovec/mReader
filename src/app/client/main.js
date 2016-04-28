@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import IpcRenderer from 'ipc-renderer'
 
-import Book from './book'
+import Book from './scripts/book'
 import App from './views/app'
 
 import InjectTapEventPlugin from 'react-tap-event-plugin'
@@ -13,15 +13,15 @@ export let Library = []
 let appRef = {}
 
 window.onload = () => {
-  Library = LoadLibrary().map((book) => {
-    return new Book(book)
-  })
+  // Library = LoadLibrary().map((book) => {
+  //   return new Book(book)
+  // })
   render()
   mountIPC()
   InjectTapEventPlugin()
-  if (Library.length === 0) {
+  // if (Library.length === 0) {
     IpcRenderer.send('library', {type: 'sync'})
-  }
+  // }
 }
 
 function render (props) {

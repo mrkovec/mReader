@@ -84,12 +84,12 @@ export function ReadFile (path) {
 
 export function WriteFile (path, data) {
   return new Promise((resolve, reject) => {
-    Fs.writeFile(path, data/* JSON.stringify(data)*/, 'utf8', 'w', (err) => {
+    Fs.writeFile(path, data, 'utf8', 'w', (err) => {
       if (err) {
         console.log(`WriteFile (${path}) = ${err}`)
         reject(new Error(err))
       } else {
-        resolve()
+        resolve('ok')
       }
     })
   })

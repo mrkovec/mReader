@@ -5,7 +5,7 @@ import Path from 'path'
 import {TempPath} from './../../conf'
 import {ListFromArchive, ExtractFromArchive, ReadFile, ExistsFile, WriteFile} from './util'
 
-export function OpenComics (book) {
+export function OpenComic (book) {
   // let indexPromises = book.body.map((htmlfile, i) => {
   //   return ReadFile(htmlfile).then((html) => {
   //     let title = html.match(title_rx).map((a) => {
@@ -40,28 +40,39 @@ export function OpenComics (book) {
   // })
 }
 
-const comics_rx = /^(.+) (\d{3}) .+/i
+const comic_rx = /^(.+) (\d{3}) .+/i
 
-export function ParseComics (book) {
-  let cb = book.file.match(comics_rx)
+export function ParseComic (book) {
+  let cb = book.file.match(comic_rx)
   if (cb) {
     return ListFromArchive(book.fullPath, '-i!*.jpg').then((files) => {
       book.name = cb[1]
       book.issue = Number(cb[2])
       book.body = files
       return ExtractFromArchive(book.fullPath, Path.basename(files[0]), 'x').then(() => {
-        let infofile = Path.join(TempPath, Path.basename(book.file), 'nfo.json')
-        return ExistsFile(infofile).catch(() => {
-          book.info = {added: (new Date()), lastReadPage: 1}
-          return WriteFile(infofile, JSON.stringify(book.info)).then(() => {
+        return book.getInfo().then((info) => {
+          if (info) {
+            book.bookInfo = info
             return book
-          })
-        }).then(() => {
-          return ReadFile(infofile).then((info) => {
-            book.info = JSON.parse(info)
-            return book
-          })
+          }
+          book.bookInfo = {added: (new Date()), readOffset: 0}
+          return book
+          // return book.setInfo(info).then(() => {
+          //   return book
+          // })
         })
+        // let infofile = Path.join(TempPath, Path.basename(book.file), 'nfo.json')
+        // return ExistsFile(infofile).catch(() => {
+        //   book.info = {added: (new Date()), lastReadPage: 1}
+        //   return WriteFile(infofile, JSON.stringify(book.info)).then(() => {
+        //     return book
+        //   })
+        // }).then(() => {
+        //   return ReadFile(infofile).then((info) => {
+        //     book.info = JSON.parse(info)
+        //     return book
+        //   })
+        // })
       })
     })
   }

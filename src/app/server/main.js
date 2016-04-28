@@ -4,7 +4,8 @@ import App from 'app'
 import IpcMain from 'ipc-main'
 import BrowserWindow from 'browser-window'
 
-import {SyncLibrary, ClearLibrary, Book} from './scripts/library'
+import {SyncLibrary, ClearLibrary} from './scripts/library'
+import {Book} from './scripts/book'
 import {PrintErr} from './scripts/util'
 
 let mainWindow = null
@@ -36,9 +37,10 @@ function mountIPC () {
     switch (type) {
       case 'sync':
         SyncLibrary().then((res) => {
+          // console.log(res)
           sendResponse(event.sender, {library: res, info: `library synced susesfully`})
         }).catch((err) => {
-          PrintErr(err, 'IpcMain.on library / sync')
+          PrintErr(err, 'IpcMain.on library sync')
           sendResponse(event.sender, {error: err})
         })
         break
@@ -46,7 +48,7 @@ function mountIPC () {
         ClearLibrary().then(() => {
           sendResponse(event.sender, {info: `library cleared`})
         }).catch((err) => {
-          PrintErr(err, 'IpcMain.on library / clear')
+          PrintErr(err, 'IpcMain.on library clear')
           sendResponse(event.sender, {error: err})
         })
         break
@@ -64,13 +66,25 @@ function mountIPC () {
         book.open().then((resp) => {
           sendResponse(event.sender, {book: resp})
         }).catch((err) => {
-          PrintErr(err, 'IpcMain.on book / open')
+          PrintErr(err, 'IpcMain.on book open')
           sendResponse(event.sender, {error: err})
         })
         break
       default:
         console.log(`unknown msg type ${type} in ${arg}`)
     }
+  })
+
+  IpcMain.on('readOffset', (event, arg) => {
+    let {offset, file} = arg
+    let book = new Book({file: file})
+    book.getInfo().then((info) => {
+      info.readOffset = offset
+      // console.log(info)
+      book.bookInfo = info
+    }).catch((err) => {
+      PrintErr(err, 'IpcMain.on readOffset getInfo')
+    })
   })
 }
 
