@@ -9,17 +9,20 @@ import {ParseComic} from './comic'
 export class Book {
   constructor (data) {
     if (data) {
-      let {type, name, author, issue, libpath, relpath, file, body, info} = data
-      this.type = type
-      this.name = name
-      this.author = author
-      this.issue = issue
-      this.libpath = libpath
-      this.relpath = relpath
-      this.file = file
-      this.body = body
-      this.info = info
+      this.bookData = data
     }
+  }
+  set bookData (data) {
+    let {type, name, author, issue, libpath, relpath, file, body, info} = data
+    this.type = type
+    this.name = name
+    this.author = author
+    this.issue = issue
+    this.libpath = libpath
+    this.relpath = relpath
+    this.file = file
+    this.body = body
+    this.info = info
   }
   get fullPath () {
     return Path.join(this.libpath, this.relpath, this.file)
@@ -30,36 +33,45 @@ export class Book {
   parse (dir, file) {
     dir = Path.normalize(dir)
     file = Path.normalize(file)
+    this.file = Path.basename(file)
 
-    this.type = 'x'
-    if (ComicExt.indexOf(Path.extname(file)) >= 0) {
-      this.type = 'comic'
-    }
-    if (BookExt.indexOf(Path.extname(file)) >= 0) {
-      this.type = 'ebook'
-      if (Path.extname(file) === '.pdf') {
-        this.type = 'pdf'
+    let bookfile = Path.join(this.dataPath, 'book.info')
+    return ExistsFile(bookfile).then(() => {
+      return ReadFile(bookfile).then((data) => {
+        this.bookData = new Book(JSON.parse(data))
+        return this
+      })
+    }).catch(() => {
+      this.type = 'x'
+      if (ComicExt.indexOf(Path.extname(file)) >= 0) {
+        this.type = 'comic'
       }
-    }
-    this.name = Path.basename(file)
-    this.author = ''
-    this.issue = ''
-    this.libpath = dir
-    this.relpath = Path.dirname(Path.relative(dir, file))
-    this.file = this.name
-    this.body = []
-    this.info = null
-
-    switch (this.type) {
-      case 'ebook':
-        return ParseEbook(this)
-      case 'comic':
-        return ParseComic(this)
-      case 'pdf':
-        return ParsePDF(this)
-      default:
-        throw new Error('unknown book type')
-    }
+      if (BookExt.indexOf(Path.extname(file)) >= 0) {
+        this.type = 'ebook'
+        if (Path.extname(file) === '.pdf') {
+          this.type = 'pdf'
+        }
+      }
+      this.name = this.file
+      this.author = ''
+      this.issue = ''
+      this.libpath = dir
+      this.relpath = Path.dirname(Path.relative(dir, file))
+      this.body = []
+      this.info = null
+      console.log('parse')
+      // console.log(this)
+      switch (this.type) {
+        case 'ebook':
+          return ParseEbook(this)
+        case 'comic':
+          return ParseComic(this)
+        case 'pdf':
+          return ParsePDF(this)
+        default:
+          throw new Error('unknown book type')
+      }
+    })
   }
   clear () {
     // let tmpdir = Path.join(TempPath, Path.basename(this.file))
@@ -95,16 +107,16 @@ export class Book {
       }
     })
   }
-  getInfo () {
-    let infofile = Path.join(TempPath, Path.basename(this.file), 'nfo.json')
-    return ExistsFile(infofile).catch(() => {
-      return null
-    }).then(() => {
-      return ReadFile(infofile).then((info) => {
-        this.info = JSON.parse(info)
-        return this
-      })
-    })
+  // getInfo () {
+  //   let infofile = Path.join(TempPath, Path.basename(this.file), 'nfo.json')
+  //   return ExistsFile(infofile).catch(() => {
+  //     return null
+  //   }).then(() => {
+  //     return ReadFile(infofile).then((info) => {
+  //       this.info = JSON.parse(info)
+  //       return this
+  //     })
+  //   })
 
     // let book = this
     // return new Promise(function (resolve, reject) {
@@ -122,18 +134,18 @@ export class Book {
     //     })
     //   }
     // })
-  }
-  set bookInfo (info) {
-    this.info = info
-    let infofile = Path.join(TempPath, Path.basename(this.file), 'nfo.json')
-    WriteFile(infofile, JSON.stringify(this.info))
-    // let book = this
-    // this.info = info
-    // if (!toFile) {
-    //   return new Promise(function (resolve, reject) { resolve(this) })
-    // } else {
-    //   let infofile = Path.join(TempPath, Path.basename(this.file), 'nfo.json')
-    //   return WriteFile(infofile, JSON.stringify(this.info))
-    // }
-  }
+  // }
+  // set bookInfo (info) {
+  //   this.info = info
+  //   let infofile = Path.join(TempPath, Path.basename(this.file), 'nfo.json')
+  //   WriteFile(infofile, JSON.stringify(this.info))
+  //   // let book = this
+  //   // this.info = info
+  //   // if (!toFile) {
+  //   //   return new Promise(function (resolve, reject) { resolve(this) })
+  //   // } else {
+  //   //   let infofile = Path.join(TempPath, Path.basename(this.file), 'nfo.json')
+  //   //   return WriteFile(infofile, JSON.stringify(this.info))
+  //   // }
+  // }
 }

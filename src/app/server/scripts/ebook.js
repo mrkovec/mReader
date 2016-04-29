@@ -2,7 +2,7 @@
 
 import Path from 'path'
 // import {TempPath} from './../../conf'
-import {ListFromArchive, ExtractFromArchive, ReadFile, ParseXML} from './util'
+import {ListFromArchive, ExtractFromArchive, ReadFile, WriteFile, ParseXML, CreateDir} from './util'
 
 // const head_rx = /<title>(.*?)<\/title>/gi
 const title_rx = /<title[^>]*>((.|[\n\r])*)<\/title>/im
@@ -57,7 +57,6 @@ export function OpenEbook (book) {
 }
 
 export function ParseEbook (book) {
-  // return ListFromArchive(book.fullPath, '-i!content.opf -i!*.html -i!*.xhtml').then((files) => {
   return ListFromArchive(book.fullPath, '-i!content.opf').then((files) => {
     let opf = files[0]
     return ExtractFromArchive(book.fullPath, Path.basename(opf), 'x').then(() => {
@@ -73,12 +72,8 @@ export function ParseEbook (book) {
           }).map((item) => {
             return Path.join(Path.dirname(opf), item['$']['href'])
           })
-          return book.getInfo().then((info) => {
-            if (info) {
-              book.bookInfo = info
-              return book
-            }
-            book.bookInfo = {added: (new Date()), readOffset: 0}
+          book.info = {added: (new Date()), readOffset: 0}
+          return WriteFile(Path.join(book.dataPath, 'book.info'), JSON.stringify(book)).then(() => {
             return book
           })
         })
@@ -88,22 +83,10 @@ export function ParseEbook (book) {
 }
 
 export function ParsePDF (book) {
-  // return book.getInfo().then((info) => {
-  //   if (info) {
-  //     book.bookInfo = info
-  //     return book
-  //   }
-  //   book.bookInfo = {added: (new Date()), readOffset: 0}
-  //   return book
-    // book.info = info
-    // return book.setInfo(info).then(() => {
-    //   return book
-    // })
-  // })
-
-  return new Promise(function (resolve, reject) {
-    book.info = {}
-    book.body = []
-    resolve(book)
+  return CreateDir(book.dataPath).then(() => {
+    book.info = {added: (new Date()), readOffset: 0}
+    return WriteFile(Path.join(book.dataPath, 'book.info'), JSON.stringify(book)).then(() => {
+      return book
+    })
   })
 }

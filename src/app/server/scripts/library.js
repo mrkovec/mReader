@@ -17,15 +17,30 @@ export function ClearLibrary () {
 export function SyncLibrary () {
   let allbooks = []
   return ReadFile(Path.join(AppPath, 'lib.json')).then((libs) => {
-    return Promise.all(JSON.parse(libs).map((libdir) => {
-      return Promise.all(ListFiles(libdir, null, (f) => { return `${BookExt}${ComicExt}`.indexOf(Path.extname(f)) >= 0 }).map((file) => {
-        return (new Book()).parse(libdir, file)
-      }))
-    })).then((books) => {
-      books.forEach((b) => {
-        allbooks = allbooks.concat(b)
+    let libpromises = JSON.parse(libs).map((libdir) => {
+      let bookpromises = ListFiles(libdir, null, (f) => { return `${BookExt}${ComicExt}`.indexOf(Path.extname(f)) >= 0 }).map((file) => {
+        return new Book().parse(libdir, file)
       })
-      return allbooks
+      return Promise.all(bookpromises)
     })
+    return Promise.all(libpromises)
+  }).then((books) => {
+    books.forEach((b) => {
+      allbooks = allbooks.concat(b)
+    })
+    return allbooks
   })
+  //     })).then((a) => {
+  //       console.log('fuu')
+  //       console.log(a)
+  //     })
+  //   })).then((books) => {
+  //     console.log('kkkuu')
+  //     console.log(books)
+  //     books.forEach((b) => {
+  //       allbooks = allbooks.concat(b)
+  //     })
+  //     return allbooks
+  //   })
+  // })
 }

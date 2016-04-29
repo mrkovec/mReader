@@ -8,8 +8,12 @@ import {TempPath} from './../../conf'
 
 export function CreateDir (dir) {
   return new Promise(function (resolve, reject) {
-    Fs.mkdir(dir, () => {
-      resolve('ok')
+    Fs.mkdir(dir, (err) => {
+      if (err) {
+        reject(new Error(err))
+      } else {
+        resolve(`dir ${dir} created`)
+      }
     })
   })
 }
@@ -18,7 +22,6 @@ export function PrintErr (err, source) {
   if (source) {
     console.error(source)
   }
-  // console.log(`${source ? source : ''}${source ? ' => ' : ''}${err.fileName}(${err.lineNumber}/${err.columnNumber})`)
   console.error(err.stack)
 }
 
@@ -67,7 +70,7 @@ export function ExtractFromArchive (archfile, file, pr = 'e', out) {
         console.log(`ExtractFromArchive (${archfile}, ${file}, ${pr}, ${out}) = ${err}`)
         reject(new Error(err))
       } else {
-        resolve('ok')
+        resolve(`${archfile} extracted`)
       }
     })
   })
@@ -97,7 +100,7 @@ export function WriteFile (path, data) {
         console.log(`WriteFile (${path}) = ${err}`)
         reject(new Error(err))
       } else {
-        resolve('ok')
+        resolve(`${path} file writed`)
       }
     })
   })
@@ -141,7 +144,7 @@ export function DeleteFile (path) {
       if (err) {
         reject(new Error(err))
       } else {
-        resolve('ok')
+        resolve(`${path} deleted`)
       }
     })
   })
