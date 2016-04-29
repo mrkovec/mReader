@@ -48,7 +48,6 @@ function mountIPC () {
   })
 
   IpcRenderer.on('book', (event, book) => {
-    console.log(book)
     render({book: new Book(book)})
     appRef.handleAppChange({view: 'book'})
   })

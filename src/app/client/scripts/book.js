@@ -1,4 +1,5 @@
 'use strict'
+import Path from 'path'
 
 export default class Book {
   constructor (data) {
@@ -14,13 +15,14 @@ export default class Book {
       this.body = body
       this.info = info
       this.kap = kap
-      console.log(this.info)
     }
   }
 
   get fname () {
     switch (this.type) {
       case 'ebook':
+        return this.name
+      case 'pdf':
         return this.name
       case 'comic':
         return this.issue
@@ -33,11 +35,15 @@ export default class Book {
     switch (this.type) {
       case 'ebook':
         return this.author
+      case 'pdf':
+        return this.author
       case 'comic':
         return this.name
       default:
         return 'unknown book'
     }
   }
-
+  get fullPath () {
+    return Path.join(this.libpath, this.relpath, this.file)
+  }
 }

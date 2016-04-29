@@ -3,7 +3,7 @@ import Path from 'path'
 import Fs from 'fs'
 import {TempPath, ComicExt, BookExt} from './../../conf'
 import {ReadFile, WriteFile, ListFiles, DeleteFile, ExistsFile, ExtractFromArchive} from './util'
-import {ParseEbook, OpenEbook} from './ebook'
+import {ParseEbook, OpenEbook, ParsePDF} from './ebook'
 import {ParseComic} from './comic'
 
 export class Book {
@@ -37,6 +37,9 @@ export class Book {
     }
     if (BookExt.indexOf(Path.extname(file)) >= 0) {
       this.type = 'ebook'
+      if (Path.extname(file) === '.pdf') {
+        this.type = 'pdf'
+      }
     }
     this.name = Path.basename(file)
     this.author = ''
@@ -52,6 +55,8 @@ export class Book {
         return ParseEbook(this)
       case 'comic':
         return ParseComic(this)
+      case 'pdf':
+        return ParsePDF(this)
       default:
         throw new Error('unknown book type')
     }
@@ -81,6 +86,8 @@ export class Book {
       switch (this.type) {
         case 'ebook':
           return OpenEbook(this)
+        case 'pdf':
+          return book
         case 'comic':
           return book// OpenComic(this)
         default:
@@ -89,22 +96,32 @@ export class Book {
     })
   }
   getInfo () {
-    let book = this
-    return new Promise(function (resolve, reject) {
-      if (book.info) {
-        resolve(book.info)
-      } else {
-        let infofile = Path.join(TempPath, Path.basename(book.file), 'nfo.json')
-        return ExistsFile(infofile).catch(() => {
-          return null
-        }).then(() => {
-          return ReadFile(infofile).then((info) => {
-            book.info = JSON.parse(info)
-            resolve(book.info)
-          })
-        })
-      }
+    let infofile = Path.join(TempPath, Path.basename(this.file), 'nfo.json')
+    return ExistsFile(infofile).catch(() => {
+      return null
+    }).then(() => {
+      return ReadFile(infofile).then((info) => {
+        this.info = JSON.parse(info)
+        return this
+      })
     })
+
+    // let book = this
+    // return new Promise(function (resolve, reject) {
+    //   if (book.info) {
+    //     resolve(book.info)
+    //   } else {
+    //     let infofile = Path.join(TempPath, Path.basename(book.file), 'nfo.json')
+    //     return ExistsFile(infofile).catch(() => {
+    //       reject(null)
+    //     }).then(() => {
+    //       return ReadFile(infofile).then((info) => {
+    //         book.info = JSON.parse(info)
+    //         resolve(book.info)
+    //       })
+    //     })
+    //   }
+    // })
   }
   set bookInfo (info) {
     this.info = info

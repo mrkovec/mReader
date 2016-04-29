@@ -3,6 +3,7 @@ import Bar from './bar'
 import Lib from './lib'
 import Ebook from './ebook'
 import Comic from './comic'
+import Pdf from './pdf'
 
 import Book from './../scripts/book'
 
@@ -32,7 +33,7 @@ export default class App extends React.Component {
     if (view) {
       this.setState({view: view})
     }
-    if (groupByName !== null) {
+    if (groupByName) {
       this.setState({groupByName: groupByName})
     }
   }
@@ -46,6 +47,12 @@ export default class App extends React.Component {
           return (
             <div className='appContainer'>
               <Ebook book={book} onAppChange = {this.handleAppChange}/>
+            </div>
+          )
+        case 'pdf':
+          return (
+            <div className='appContainer'>
+              <Pdf book={book} onAppChange = {this.handleAppChange}/>
             </div>
           )
         case 'comic':

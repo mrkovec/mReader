@@ -2,39 +2,32 @@ import React from 'react'
 import IpcRenderer from 'ipc-renderer'
 import Path from 'path'
 import Book from './../scripts/book'
-
 import IconButton from 'material-ui/lib/icon-button'
 import ActionHome from 'material-ui/lib/svg-icons/action/home'
-
-// let snack = {}
-// let actPage = 1
-// let numPage = 0
 
 export default class Ebook extends React.Component {
   constructor (props) {
     super(props)
     this.onBack = this.onBack.bind(this)
+    this.componentDidMount = this.componentDidMount.bind(this)
   }
-
   onBack () {
-    let poff = 100 * (document.body.scrollTop / document.body.scrollHeight)
+    let poff = Math.floor(100 * (document.body.scrollTop / document.body.scrollHeight))
     IpcRenderer.send('readOffset', {offset: poff, file: this.props.book.file})
     this.props.onAppChange({view: 'library'})
   }
-
+  componentDidMount () {
+    let book = this.book
+    setTimeout(function () {
+      window.requestAnimationFrame(() => {
+        document.body.scrollTop = Math.floor((book.info.readOffset / 100) * document.body.scrollHeight)
+      })
+    }, 0)
+  }
   render () {
     let {book} = this.props
+    this.book = book
     let index = book.kap.map((k, i, arr) => {
-      // let kaptxt = `Chapter ${i + 1}`
-      // if (k.title) {
-      //   if (i > 0) {
-      //     if (strip(k.title) !== strip(arr[i - 1].title)) {
-      //       kaptxt = k.title
-      //     }
-      //   } else {
-      //     kaptxt = k.title
-      //   }
-      // }
       return (<li><a href={`#${i + 1}`} >{k.title}</a></li>)
     })
     let pages = book.kap.map((k, i) => {
@@ -66,12 +59,6 @@ Ebook.propTypes = {
 
 }
 
-// // <div dangerouslySetInnerHTML={createIframe(this.props.src.text)} />
-// function createIframe (src) {
-//   // console.log(Path.normalize('file://' + src)) src="file://${encodeURI(src)}"
-//   return {__html: `<iframe sandbox srcdoc="${src}" ></ifarme>`}
-// }
-
 class Page extends React.Component {
   constructor (props) {
     super(props)
@@ -97,7 +84,6 @@ class Page extends React.Component {
     //   }
     // })
     this.ref.style.fontFamily = 'Roboto, sans-serif'
-    // this.ref.style = this.refParent.style
     this.ref.innerHTML = this.props.src
     let images = this.ref.getElementsByTagName('img')
     for (let i = 0; i < images.length; ++i) {

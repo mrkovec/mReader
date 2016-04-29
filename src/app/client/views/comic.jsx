@@ -8,14 +8,24 @@ export default class Comic extends React.Component {
   constructor (props) {
     super(props)
     this.onBack = this.onBack.bind(this)
+    this.componentDidMount = this.componentDidMount.bind(this)
   }
   onBack () {
-    let poff = 100 * (document.body.scrollTop / document.body.scrollHeight)
+    let poff = Math.floor(100 * (document.body.scrollTop / document.body.scrollHeight))
     IpcRenderer.send('readOffset', {offset: poff, file: this.props.book.file})
     this.props.onAppChange({view: 'library'})
   }
+  componentDidMount () {
+    let book = this.props.book
+    setTimeout(function () {
+      window.requestAnimationFrame(() => {
+        document.body.scrollTop = Math.floor((book.info.readOffset / 100) * document.body.scrollHeight)
+      })
+    }, 0)
+  }
   render () {
     let {book} = this.props
+    console.log(book)
     let pages = book.body.map((k, i) => {
       return (<Page key={i} src={`${k}`} pgn={i + 1} />)
     })

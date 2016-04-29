@@ -6,6 +6,14 @@ import xml2js from 'xml2js'
 
 import {TempPath} from './../../conf'
 
+export function CreateDir (dir) {
+  return new Promise(function (resolve, reject) {
+    Fs.mkdir(dir, () => {
+      resolve('ok')
+    })
+  })
+}
+
 export function PrintErr (err, source) {
   if (source) {
     console.error(source)

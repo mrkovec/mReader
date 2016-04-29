@@ -1,9 +1,8 @@
 'use strict'
 
 import Path from 'path'
-
-import {TempPath} from './../../conf'
-import {ListFromArchive, ExtractFromArchive, ReadFile, ParseXML, ExistsFile, WriteFile} from './util'
+// import {TempPath} from './../../conf'
+import {ListFromArchive, ExtractFromArchive, ReadFile, ParseXML} from './util'
 
 // const head_rx = /<title>(.*?)<\/title>/gi
 const title_rx = /<title[^>]*>((.|[\n\r])*)<\/title>/im
@@ -81,13 +80,30 @@ export function ParseEbook (book) {
             }
             book.bookInfo = {added: (new Date()), readOffset: 0}
             return book
-            // book.info = info
-            // return book.setInfo(info).then(() => {
-            //   return book
-            // })
           })
         })
       })
     })
+  })
+}
+
+export function ParsePDF (book) {
+  // return book.getInfo().then((info) => {
+  //   if (info) {
+  //     book.bookInfo = info
+  //     return book
+  //   }
+  //   book.bookInfo = {added: (new Date()), readOffset: 0}
+  //   return book
+    // book.info = info
+    // return book.setInfo(info).then(() => {
+    //   return book
+    // })
+  // })
+
+  return new Promise(function (resolve, reject) {
+    book.info = {}
+    book.body = []
+    resolve(book)
   })
 }

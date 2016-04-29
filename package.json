@@ -2,7 +2,7 @@
 	"name": "mReader",
 	"productName": "mReader",
 	"version": "0.1.0",
-	"description": "Open source comics/ebook reader",
+	"description": "Open source comic/ebook reader",
 	"license": "MIT",
 	"files": ["src/app/client/index.html"],
 	"main": "./src/app/init.js",
@@ -15,7 +15,7 @@
 		"react-dom": "^0.14.0",
 		"material-ui": "0.15.0-alpha.2",
 		"react-tap-event-plugin": "^0.2.0",
-		"node-7z": "*",
-		"xml2js": "*"
+		"xml2js": "*",
+		"pdfjs-dist": "*"
   }
 }

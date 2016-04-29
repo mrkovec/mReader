@@ -17,11 +17,11 @@ export default class LibItem extends React.Component {
 
   render () {
     let {book} = this.props
-    console.log(book)
+    // console.log(book)
     return (
       <div>
         <ListItem primaryText={<p>{book.fname} <span style={{color: lightBlack}}>{book.sname}</span></p>} onClick={this.onBookOpen} />
-        <LinearProgress mode='determinate' min={0} max ={100} value={book.info.readOffset} />
+        {book.info ? <LinearProgress mode='determinate' min={0} max ={100} value={book.info.readOffset} /> : null}
       </div>
     )
   }
