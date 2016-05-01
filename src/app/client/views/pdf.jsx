@@ -1,6 +1,7 @@
 import React from 'react'
 import IpcRenderer from 'ipc-renderer'
 import Book from './../scripts/book'
+// import {Lib} from './../main'
 import IconButton from 'material-ui/lib/icon-button'
 import ActionHome from 'material-ui/lib/svg-icons/action/home'
 import {PDFJS} from 'pdfjs-dist'
@@ -16,24 +17,33 @@ export default class Pdf extends React.Component {
     this.setPDF = this.setPDF.bind(this)
   }
   onBack () {
-    let poff = Math.floor(100 * (document.body.scrollTop / document.body.scrollHeight))
+    let poff = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
     IpcRenderer.send('readOffset', {offset: poff, file: this.props.book.file})
     this.props.onAppChange({view: 'library'})
   }
   componentDidMount () {
-    console.log('he')
+    // console.log('he')
     // let book = this.book
     setTimeout(function () {
       window.requestAnimationFrame(() => {
-        document.body.scrollTop = Math.floor((50 / 100) * document.body.scrollHeight)
+        document.body.scrollTop = Math.floor((50 / 100) * document.body.scrollHeiorght)
       })
     }, 1000)
   }
   setPDF () {
-    let book = this
+    let pdfbook = this
+    // let book = this.props.book
     PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
     PDFJS.getDocument(this.props.book.fullPath).then(function (pdf) {
-      book.setState({pdf: pdf})
+      // if (book.author) {
+      //   pdf.getMetadata().then((a) => {
+      //     Lib.updateBook({book: book.fullPath, author: a.info.Author})
+      //     // console.log(a.metadata.metadata['dc:author'])
+      //     // console.log(a.info.Title)
+      //     // console.log(a.metadata.metadata['dc:title'])
+      //   })
+      // }
+      pdfbook.setState({pdf: pdf})
     }).catch((err) => {
       console.log(err)
     })
@@ -101,4 +111,19 @@ class Page extends React.Component {
 Page.propTypes = {
   page: React.PropTypes.number.isRequired,
   book: React.PropTypes.object.isRequired
+}
+
+export function GetPDFinfo (book) {
+  PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
+  return PDFJS.getDocument(book.fullPath).then(function (pdf) {
+    return pdf.getMetadata()
+  //   pdf.getMetadata().then((a) => {
+  //     Lib.updateBook({book: book.fullPath, author: a.info.Author, title: a.info.Title})
+  //       // console.log(a.metadata.metadata['dc:author'])
+  //       // console.log(a.info.Title)
+  //       // console.log(a.metadata.metadata['dc:title'])
+  //   })
+  // }).catch((err) => {
+  //   console.log(err)
+  })
 }

@@ -12,7 +12,7 @@ export default class Ebook extends React.Component {
     this.componentDidMount = this.componentDidMount.bind(this)
   }
   onBack () {
-    let poff = Math.floor(100 * (document.body.scrollTop / document.body.scrollHeight))
+    let poff = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
     IpcRenderer.send('readOffset', {offset: poff, file: this.props.book.file})
     this.props.onAppChange({view: 'library'})
   }

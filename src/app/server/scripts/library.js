@@ -1,8 +1,29 @@
 'use strict'
 import Path from 'path'
 import {AppPath, ComicExt, BookExt} from './../../conf'
-import {ReadFile, ListFiles} from './util'
+import {ReadFile, ListFiles, WriteFile} from './util'
 import {Book} from './book'
+
+export function UpdateLibrary (book) {
+  return SyncLibrary().then((lib) => {
+    let i = -1
+    lib.forEach((b, k) => {
+      if (i < 0) {
+        if (b.fullPath === book.fullPath & b.type === book.type) {
+          i = k
+        }
+      }
+    })
+    if (i > 0) {
+      lib[i].author = book.author
+      lib[i].name = book.name
+      return WriteFile(Path.join(lib[i].dataPath, 'book.info'), JSON.stringify(lib[i])).then(() => {
+        return lib[i]
+      })
+    }
+    return lib
+  })
+}
 
 export function ClearLibrary () {
   return ReadFile(Path.join(AppPath, 'lib.json')).then((libs) => {

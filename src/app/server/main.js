@@ -4,7 +4,7 @@ import App from 'app'
 import IpcMain from 'ipc-main'
 import BrowserWindow from 'browser-window'
 
-import {SyncLibrary, ClearLibrary} from './scripts/library'
+import {SyncLibrary, ClearLibrary, UpdateLibrary} from './scripts/library'
 import {Book} from './scripts/book'
 import {PrintErr} from './scripts/util'
 
@@ -33,11 +33,12 @@ function mountIPC () {
   })
 
   IpcMain.on('library', (event, arg) => {
-    let {type} = arg
+    let {type, book} = arg
+    console.log(type)
+    console.log(book)
     switch (type) {
       case 'sync':
         SyncLibrary().then((res) => {
-          // console.log(res)
           sendResponse(event.sender, {library: res, info: `library synced susesfully`})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on library sync')
@@ -49,6 +50,15 @@ function mountIPC () {
           sendResponse(event.sender, {info: `library cleared`})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on library clear')
+          sendResponse(event.sender, {error: err})
+        })
+        break
+      case 'update':
+        UpdateLibrary(new Book(book)).then((res) => {
+          console.log(res)
+          sendResponse(event.sender, {library: res})
+        }).catch((err) => {
+          PrintErr(err, 'IpcMain.on library update')
           sendResponse(event.sender, {error: err})
         })
         break

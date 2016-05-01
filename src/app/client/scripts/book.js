@@ -46,4 +46,15 @@ export default class Book {
   get fullPath () {
     return Path.join(this.libpath, this.relpath, this.file)
   }
+
+  get unread () {
+    return (this.info.readOffset < 95)
+  }
+  get read () {
+    return (this.info.readOffset >= 95)
+  }
+  get inprogress () {
+    return (this.info.readOffset > 0) & (this.info.readOffset <= 95)
+  }
+
 }
