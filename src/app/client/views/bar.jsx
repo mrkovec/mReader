@@ -1,18 +1,15 @@
 import React from 'react'
 import IpcRenderer from 'ipc-renderer'
 
-import DropDownMenu from 'material-ui/lib/DropDownMenu'
-import Toolbar from 'material-ui/lib/toolbar/toolbar'
-import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group'
-import ToolbarSeparator from 'material-ui/lib/toolbar/toolbar-separator'
-import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title'
-import IconMenu from 'material-ui/lib/menus/icon-menu'
-import MenuItem from 'material-ui/lib/menus/menu-item'
-import IconButton from 'material-ui/lib/icon-button'
-import Divider from 'material-ui/lib/divider'
-import Download from 'material-ui/lib/svg-icons/action/info-outline'
-import Exit from 'material-ui/lib/svg-icons/action/exit-to-app'
-import MoreVertIcon from 'material-ui/lib/svg-icons/navigation/more-vert'
+import DropDownMenu from 'material-ui/DropDownMenu'
+import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar'
+import IconMenu from 'material-ui/IconMenu'
+import MenuItem from 'material-ui/MenuItem'
+import IconButton from 'material-ui/IconButton/IconButton'
+import Divider from 'material-ui/divider'
+import Download from 'material-ui/svg-icons/action/info-outline'
+import Exit from 'material-ui/svg-icons/action/exit-to-app'
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 
 export default class Bar extends React.Component {
   constructor (props) {

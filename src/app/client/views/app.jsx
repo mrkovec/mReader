@@ -7,6 +7,11 @@ import Pdf from './pdf'
 
 import Book from './../scripts/book'
 
+import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme'
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
+// import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme'
+// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+
 export default class App extends React.Component {
   constructor (props) {
     super(props)
@@ -17,6 +22,9 @@ export default class App extends React.Component {
                   groupByName: false
     }
     this.handleAppChange = this.handleAppChange.bind(this)
+  }
+  getChildContext () {
+    return { muiTheme: getMuiTheme(baseTheme) }
   }
 
   handleAppChange (changed) {
@@ -66,14 +74,18 @@ export default class App extends React.Component {
     }
     return (
       <div className='appContainer'>
-        <Bar settings={this.state} onAppChange = {this.handleAppChange} />
-        <Lib library = {library} settings={this.state} />
+
+          <Bar settings={this.state} onAppChange = {this.handleAppChange} />
+          <Lib library = {library} settings={this.state} />
+
       </div>
     )
   }
 }
-
 App.propTypes = {
   library: React.PropTypes.array.isRequired,
   book: React.PropTypes.instanceOf(Book)
+}
+App.childContextTypes = {
+  muiTheme: React.PropTypes.object.isRequired
 }

@@ -14,11 +14,13 @@ export function UpdateLibrary (book) {
         }
       }
     })
-    if (i > 0) {
+    if (i >= 0) {
       lib[i].author = book.author
       lib[i].name = book.name
+      lib[i].info.readOffset = book.info.readOffset
+      lib[i].info.zoom = book.info.zoom
       return WriteFile(Path.join(lib[i].dataPath, 'book.info'), JSON.stringify(lib[i])).then(() => {
-        return lib[i]
+        return lib
       })
     }
     return lib

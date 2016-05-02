@@ -2,10 +2,10 @@ import React from 'react'
 import IpcRenderer from 'ipc-renderer'
 import Book from './../scripts/book'
 import {GetPDFinfo} from './pdf'
-import ListItem from 'material-ui/lib/lists/list-item'
-import LinearProgress from 'material-ui/lib/linear-progress'
-import {darkBlack, lightBlack} from 'material-ui/lib/styles/colors'
-import Avatar from 'material-ui/lib/avatar'
+import {ListItem} from 'material-ui/List'
+import LinearProgress from 'material-ui/LinearProgress'
+import {darkBlack, lightBlack} from 'material-ui/styles/colors'
+// import Avatar from 'material-ui/avatar'
 
 export default class LibItem extends React.Component {
   constructor (props) {

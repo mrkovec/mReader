@@ -1,5 +1,7 @@
 import React from 'react'
 import LibItem from './libitem'
+
+import {List} from 'material-ui/List'
 // import Library from './../scripts/library'
 // import {Lib from './../main'
 
@@ -52,7 +54,9 @@ export default class Lib extends React.Component {
     }
     return (
       <section className='libContainer'>
-        {lib}
+        <List>
+          {lib}
+        </List>
       </section>
     )
   }

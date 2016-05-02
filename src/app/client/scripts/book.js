@@ -48,13 +48,13 @@ export default class Book {
   }
 
   get unread () {
-    return (this.info.readOffset < 95)
+    return (this.info.readOffset < 99)
   }
   get read () {
-    return (this.info.readOffset >= 95)
+    return (this.info.readOffset >= 99)
   }
   get inprogress () {
-    return (this.info.readOffset > 0) & (this.info.readOffset <= 95)
+    return (this.info.readOffset > 0) & (this.info.readOffset <= 99)
   }
 
 }

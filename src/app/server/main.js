@@ -34,8 +34,8 @@ function mountIPC () {
 
   IpcMain.on('library', (event, arg) => {
     let {type, book} = arg
-    console.log(type)
-    console.log(book)
+    // console.log(type)
+    // console.log(book)
     switch (type) {
       case 'sync':
         SyncLibrary().then((res) => {
@@ -55,7 +55,7 @@ function mountIPC () {
         break
       case 'update':
         UpdateLibrary(new Book(book)).then((res) => {
-          console.log(res)
+          // console.log(res)
           sendResponse(event.sender, {library: res})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on library update')

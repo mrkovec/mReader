@@ -1,32 +1,46 @@
 import React from 'react'
 import IpcRenderer from 'ipc-renderer'
+import WebFrame from 'web-frame'
 import Book from './../scripts/book'
 // import {Lib} from './../main'
-import IconButton from 'material-ui/lib/icon-button'
-import ActionHome from 'material-ui/lib/svg-icons/action/home'
+import IconButton from 'material-ui/IconButton/IconButton'
+import ActionHome from 'material-ui/svg-icons/action/home'
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
+import IconMenu from 'material-ui/IconMenu'
+import MenuItem from 'material-ui/MenuItem'
+import ArrowDropLeft from 'material-ui/svg-icons/navigation/chevron-left'
+
 import {PDFJS} from 'pdfjs-dist'
 
 export default class Pdf extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      pdf: null
+      pdf: null,
+      zoom: 100
     }
     this.onBack = this.onBack.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
     this.setPDF = this.setPDF.bind(this)
   }
+  zoom (z) {
+    if (z === 0) {
+      this.setState({zoom: 100})
+    } else {
+      this.setState({zoom: this.state.zoom + z * this.state.zoom})
+    }
+  }
   onBack () {
-    let poff = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
-    IpcRenderer.send('readOffset', {offset: poff, file: this.props.book.file})
+    this.props.book.info.readOffset = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
+    IpcRenderer.send('library', {type: 'update', book: this.props.book})
     this.props.onAppChange({view: 'library'})
   }
   componentDidMount () {
-    // console.log('he')
-    // let book = this.book
+    let book = this.props.book
+    this.setState({zoom: book.info.zoom ? book.info.zoom: 100})
     setTimeout(function () {
       window.requestAnimationFrame(() => {
-        document.body.scrollTop = Math.floor((50 / 100) * document.body.scrollHeiorght)
+        document.body.scrollTop = Math.floor((book.info.readOffset / 100) * document.body.scrollHeight)
       })
     }, 1000)
   }
@@ -35,14 +49,6 @@ export default class Pdf extends React.Component {
     // let book = this.props.book
     PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
     PDFJS.getDocument(this.props.book.fullPath).then(function (pdf) {
-      // if (book.author) {
-      //   pdf.getMetadata().then((a) => {
-      //     Lib.updateBook({book: book.fullPath, author: a.info.Author})
-      //     // console.log(a.metadata.metadata['dc:author'])
-      //     // console.log(a.info.Title)
-      //     // console.log(a.metadata.metadata['dc:title'])
-      //   })
-      // }
       pdfbook.setState({pdf: pdf})
     }).catch((err) => {
       console.log(err)
@@ -57,17 +63,35 @@ export default class Pdf extends React.Component {
     for (let i = 1; i <= this.state.pdf.numPages; i++) {
       pages = pages.concat(
         <div key={i} className='itemContainer'>
-          <Page book={this.state.pdf} page={i} />
+          <Page book={this.state.pdf} page={i} zoom={this.state.zoom}/>
           </div>
       )
     }
     return (
       <div className='bookContainer'>
-        <div style={{position: 'fixed', left: '5px'}}>
+      <header>
+        <section style={{position: 'fixed', left: '5px'}}>
           <IconButton tooltip='Library' iconStyle={{opacity: '0.5'}} onTouchTap={this.onBack}>
             <ActionHome />
           </IconButton>
-        </div>
+        </section>
+        <section style={{position: 'fixed', right: '5px'}}>
+          <IconMenu
+            iconButtonElement={<IconButton iconStyle={{opacity: '0.5'}}><MoreVertIcon /></IconButton>}
+            anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+            targetOrigin={{horizontal: 'right', vertical: 'top'}}
+          >
+            <MenuItem primaryText='zoom' leftIcon={<ArrowDropLeft />} insetChildren={true}
+            menuItems={[
+              <div>
+                <MenuItem key={1} primaryText='in' onTouchTap={() => { this.zoom(1) }} />
+                <MenuItem key={2} primaryText='out' onTouchTap={() => { this.zoom(-1) }} />
+                <MenuItem key={3} primaryText='reset' onTouchTap={() => { this.zoom(0) }}/>
+              </div>
+            ]} />
+          </IconMenu>
+        </section>
+      </header>
         {pages}
       </div>
     )
@@ -83,12 +107,19 @@ class Page extends React.Component {
     super(props)
     this.componentDidMount = this.componentDidMount.bind(this)
   }
+  componentWillReceiveProps (nextProps) {
+    // console.log(nextProps)
+    this.componentDidMount()
+   }
   componentDidMount () {
+    let zoom = this.props.zoom
     let pdfpage = this.props.page
     this.props.book.getPage(this.props.page).then(function (page) {
       let viewport = page.getViewport(1)
       let scale = window.innerWidth / viewport.width
-      viewport = page.getViewport(scale)
+      console.log(scale * zoom / 100)
+      // viewport = page.getViewport(scale * zoom / 100)
+      viewport = page.getViewport(0.2)
       let canvas = document.getElementById(`canvas${pdfpage}`)
       let context = canvas.getContext('2d')
       canvas.height = viewport.height
@@ -117,13 +148,5 @@ export function GetPDFinfo (book) {
   PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
   return PDFJS.getDocument(book.fullPath).then(function (pdf) {
     return pdf.getMetadata()
-  //   pdf.getMetadata().then((a) => {
-  //     Lib.updateBook({book: book.fullPath, author: a.info.Author, title: a.info.Title})
-  //       // console.log(a.metadata.metadata['dc:author'])
-  //       // console.log(a.info.Title)
-  //       // console.log(a.metadata.metadata['dc:title'])
-  //   })
-  // }).catch((err) => {
-  //   console.log(err)
   })
 }
