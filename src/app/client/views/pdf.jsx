@@ -32,12 +32,13 @@ export default class Pdf extends React.Component {
   }
   onBack () {
     this.props.book.info.readOffset = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
+    this.props.book.info.zoom = this.state.zoom
     IpcRenderer.send('library', {type: 'update', book: this.props.book})
     this.props.onAppChange({view: 'library'})
   }
   componentDidMount () {
     let book = this.props.book
-    this.setState({zoom: book.info.zoom ? book.info.zoom: 100})
+    this.setState({zoom: book.info.zoom ? book.info.zoom : 100})
     setTimeout(function () {
       window.requestAnimationFrame(() => {
         document.body.scrollTop = Math.floor((book.info.readOffset / 100) * document.body.scrollHeight)
@@ -46,7 +47,6 @@ export default class Pdf extends React.Component {
   }
   setPDF () {
     let pdfbook = this
-    // let book = this.props.book
     PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
     PDFJS.getDocument(this.props.book.fullPath).then(function (pdf) {
       pdfbook.setState({pdf: pdf})
@@ -63,7 +63,7 @@ export default class Pdf extends React.Component {
     for (let i = 1; i <= this.state.pdf.numPages; i++) {
       pages = pages.concat(
         <div key={i} className='itemContainer'>
-          <Page book={this.state.pdf} page={i} zoom={this.state.zoom}/>
+          <Page book={this.state.pdf} pgn={i} zoom={this.state.zoom}/>
           </div>
       )
     }
@@ -84,9 +84,9 @@ export default class Pdf extends React.Component {
             <MenuItem primaryText='zoom' leftIcon={<ArrowDropLeft />} insetChildren={true}
             menuItems={[
               <div>
-                <MenuItem key={1} primaryText='in' onTouchTap={() => { this.zoom(1) }} />
-                <MenuItem key={2} primaryText='out' onTouchTap={() => { this.zoom(-1) }} />
-                <MenuItem key={3} primaryText='reset' onTouchTap={() => { this.zoom(0) }}/>
+                <MenuItem primaryText='in' onTouchTap={() => { this.zoom(0.1) }} />
+                <MenuItem primaryText='out' onTouchTap={() => { this.zoom(-0.1) }} />
+                <MenuItem primaryText='reset' onTouchTap={() => { this.zoom(0) }}/>
               </div>
             ]} />
           </IconMenu>
@@ -105,22 +105,20 @@ Pdf.propTypes = {
 class Page extends React.Component {
   constructor (props) {
     super(props)
+    this.state = {
+      page: null
+    }
     this.componentDidMount = this.componentDidMount.bind(this)
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillUpdate (nextProps, nextState) {
     // console.log(nextProps)
-    this.componentDidMount()
-   }
-  componentDidMount () {
-    let zoom = this.props.zoom
-    let pdfpage = this.props.page
-    this.props.book.getPage(this.props.page).then(function (page) {
-      let viewport = page.getViewport(1)
+    // console.log(nextState)
+    if (nextState.page) {
+      let viewport = nextState.page.getViewport(1)
       let scale = window.innerWidth / viewport.width
-      console.log(scale * zoom / 100)
-      // viewport = page.getViewport(scale * zoom / 100)
-      viewport = page.getViewport(0.2)
-      let canvas = document.getElementById(`canvas${pdfpage}`)
+      console.log(scale + ' ' + nextProps.zoom / 100)
+      viewport = nextState.page.getViewport(scale * nextProps.zoom / 100)
+      let canvas = document.getElementById(`canvas${nextProps.pgn}`)
       let context = canvas.getContext('2d')
       canvas.height = viewport.height
       canvas.width = viewport.width
@@ -128,19 +126,26 @@ class Page extends React.Component {
         canvasContext: context,
         viewport: viewport
       }
-      page.render(renderContext)
+      nextState.page.render(renderContext)
+    }
+  }
+  componentDidMount () {
+    let pdfpage = this
+    this.props.book.getPage(this.props.pgn).then(function (page) {
+      pdfpage.setState({page: page})
     })
   }
   render () {
     return (
       <div className='pageContainer'>
-        <canvas id={`canvas${this.props.page}`} ></canvas>
+        <canvas id={`canvas${this.props.pgn}`} ></canvas>
       </div>
     )
   }
 }
 Page.propTypes = {
-  page: React.PropTypes.number.isRequired,
+  pgn: React.PropTypes.number.isRequired,
+  zoom: React.PropTypes.number.isRequired,
   book: React.PropTypes.object.isRequired
 }
 

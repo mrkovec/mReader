@@ -40,12 +40,13 @@ export default class Ebook extends React.Component {
     this.props.book.kap = null
     this.props.book.info.readOffset = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
     this.props.book.info.zoom = this.state.zoom
+    this.props.book.info.font = this.state.font
     IpcRenderer.send('library', {type: 'update', book: this.props.book})
     this.props.onAppChange({view: 'library'})
   }
   componentDidMount () {
     let book = this.book
-    this.setState({zoom: book.info.zoom ? book.info.zoom: 100})
+    this.setState({zoom: book.info.zoom ? book.info.zoom : 100, font: book.info.font ? book.info.font : 'Roboto, sans-serif'})
     setTimeout(function () {
       window.requestAnimationFrame(() => {
         document.body.scrollTop = Math.floor((book.info.readOffset / 100) * document.body.scrollHeight)
@@ -96,9 +97,9 @@ export default class Ebook extends React.Component {
               <MenuItem primaryText='zoom' leftIcon={<ArrowDropLeft />} insetChildren={true}
                 menuItems={[
                   <div>
-                 <MenuItem key={1} primaryText='in' onTouchTap={() => { this.zoom(0.1) }} />
-                 <MenuItem key={2} primaryText='out' onTouchTap={() => { this.zoom(-0.1) }} />
-                 <MenuItem key={3} primaryText='reset' onTouchTap={() => { this.zoom(0) }}/>
+                 <MenuItem primaryText='in' onTouchTap={() => { this.zoom(0.1) }} />
+                 <MenuItem primaryText='out' onTouchTap={() => { this.zoom(-0.1) }} />
+                 <MenuItem primaryText='reset' onTouchTap={() => { this.zoom(0) }}/>
                  </div>
                 ]} />
                 <MenuItem primaryText='font' leftIcon={<ArrowDropLeft />} insetChildren={true}
@@ -141,13 +142,11 @@ class Page extends React.Component {
     super(props)
     this.componentDidMount = this.componentDidMount.bind(this)
   }
-  componentWillReceiveProps (nextProps) {
-    console.log(nextProps)
-    this.ref.style.fontFamily = nextProps.font // 'Roboto, sans-serif'
+  componentWillUpdate (nextProps) {
+    this.ref.style.fontFamily = nextProps.font
     this.ref.style.fontSize = `${nextProps.zoom}%`
   }
   componentDidMount () {
-    // console.log(`${this.props.zoom}%`)
     this.ref.style.fontFamily = this.props.font
     this.ref.style.fontSize = `${this.props.zoom}%`
     this.ref.innerHTML = this.props.src

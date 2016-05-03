@@ -64,9 +64,9 @@ export default class Comic extends React.Component {
               <MenuItem primaryText='zoom' leftIcon={<ArrowDropLeft />} insetChildren={true}
               menuItems={[
                 <div>
-                  <MenuItem key={1} primaryText='in' onTouchTap={() => { this.zoom(0.1) }} />
-                  <MenuItem key={2} primaryText='out' onTouchTap={() => { this.zoom(-0.1) }} />
-                  <MenuItem key={3} primaryText='reset' onTouchTap={() => { this.zoom(0) }}/>
+                  <MenuItem primaryText='in' onTouchTap={() => { this.zoom(0.1) }} />
+                  <MenuItem primaryText='out' onTouchTap={() => { this.zoom(-0.1) }} />
+                  <MenuItem primaryText='reset' onTouchTap={() => { this.zoom(0) }}/>
                 </div>
               ]} />
             </IconMenu>
