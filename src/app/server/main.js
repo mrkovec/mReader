@@ -21,6 +21,7 @@ App.on('ready', () => {
 
   mainWindow = new BrowserWindow({width: 1000, height: 600})
   mainWindow.loadURL(`file://${App.getAppPath()}/src/app/client/index.html`)
+  mainWindow.setMenu(null)
   mainWindow.webContents.openDevTools()
   mainWindow.on('closed', () => {
     mainWindow = null

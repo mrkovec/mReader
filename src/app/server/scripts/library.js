@@ -19,6 +19,8 @@ export function UpdateLibrary (book) {
       lib[i].name = book.name
       lib[i].info.readOffset = book.info.readOffset
       lib[i].info.zoom = book.info.zoom
+      lib[i].info.font = book.info.font
+      lib[i].info.read = book.info.read
       return WriteFile(Path.join(lib[i].dataPath, 'book.info'), JSON.stringify(lib[i])).then(() => {
         return lib
       })

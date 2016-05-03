@@ -12,7 +12,7 @@ export default class Lib extends React.Component {
 
   render () {
     let {library} = this.props
-    let {readState, bookType} = this.props.settings
+    let {readState, bookType, search, groupByName, sortBy} = this.props.settings
     switch (readState) {
       case 'unread':
         library.filterBy((b) => { return b.unread })
@@ -30,16 +30,59 @@ export default class Lib extends React.Component {
     if (bookType) {
       library.filterBy2((b) => { return (bookType === 'all') | (b.type === bookType) | (b.type === 'pdf' & bookType === 'ebook') })
     }
-    library.sortBy((a, b) => {
-      if (a.name < b.name) {
-        return -1
-      }
-      if (a.name > b.name) {
-        return 1
-      }
-      return 0
-    })
-    library.groupBy((b) => { return b.sname })
+    library.sortBy(null)
+    switch (sortBy) {
+      case 'name':
+        library.sortBy((a, b) => {
+          if (a.name < b.name) {
+            return -1
+          }
+          if (a.name > b.name) {
+            return 1
+          }
+          return 0
+        })
+        break
+      case 'added':
+        library.sortBy((a, b) => {
+          if (a.info.added < b.info.added) {
+            return -1
+          }
+          if (a.info.added > b.info.added) {
+            return 1
+          }
+          return 0
+        })
+        break
+      case 'read':
+        library.sortBy((a, b) => {
+          console.log(a.info.read + '-' + b.info.read)
+          if (!a.info.read & !b.info.read) {
+            return 0
+          }
+          if (!a.info.read) {
+            return 1
+          }
+          if (!b.info.read) {
+            return -1
+          }
+          if (a.info.read < b.info.read) {
+            return -1
+          }
+          if (a.info.read > b.info.read) {
+            return 1
+          }
+          return 0
+        })
+        break
+      default:
+        library.sortBy(null)
+    }
+    library.groupBy(null)
+    if (groupByName) {
+      library.groupBy((b) => { return b.sname })
+    }
+    library.search(search)
 
     library = library.books
     let lib = 'no books found'

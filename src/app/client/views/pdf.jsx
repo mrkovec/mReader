@@ -33,6 +33,7 @@ export default class Pdf extends React.Component {
   onBack () {
     this.props.book.info.readOffset = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
     this.props.book.info.zoom = this.state.zoom
+    this.props.book.info.read = new Date()
     IpcRenderer.send('library', {type: 'update', book: this.props.book})
     this.props.onAppChange({view: 'library'})
   }
@@ -71,13 +72,13 @@ export default class Pdf extends React.Component {
       <div className='bookContainer'>
       <header>
         <section style={{position: 'fixed', left: '5px'}}>
-          <IconButton tooltip='Library' iconStyle={{opacity: '0.5'}} onTouchTap={this.onBack}>
+          <IconButton tooltip='library' touch={true} iconStyle={{opacity: '0.5'}} onTouchTap={this.onBack}>
             <ActionHome />
           </IconButton>
         </section>
         <section style={{position: 'fixed', right: '5px'}}>
           <IconMenu
-            iconButtonElement={<IconButton iconStyle={{opacity: '0.5'}}><MoreVertIcon /></IconButton>}
+            iconButtonElement={<IconButton iconStyle={{opacity: '0.5'}} touch={true} tooltip={'more'}><MoreVertIcon /></IconButton>}
             anchorOrigin={{horizontal: 'right', vertical: 'top'}}
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
           >
@@ -127,11 +128,13 @@ class Page extends React.Component {
         viewport: viewport
       }
       nextState.page.render(renderContext)
+      nextState.page.cleanup()
     }
   }
   componentDidMount () {
     let pdfpage = this
     this.props.book.getPage(this.props.pgn).then(function (page) {
+      console.log(page)
       pdfpage.setState({page: page})
     })
   }

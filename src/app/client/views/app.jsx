@@ -9,6 +9,7 @@ import Book from './../scripts/book'
 
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
+import Paper from 'material-ui/Paper'
 // import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme'
 // import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
@@ -17,9 +18,10 @@ export default class App extends React.Component {
     super(props)
     this.state = {readState: 'unread',
                   bookType: 'all',
-                  search: '',
+                  search: '@@@',
                   view: 'library',
-                  groupByName: false
+                  groupByName: true,
+                  sortBy: 'name'
     }
     this.handleAppChange = this.handleAppChange.bind(this)
   }
@@ -28,7 +30,7 @@ export default class App extends React.Component {
   }
 
   handleAppChange (changed) {
-    let {readState, bookType, search, view, groupByName} = changed
+    let {readState, bookType, search, view, groupByName, sortBy} = changed
     if (readState) {
       this.setState({readState: readState})
     }
@@ -41,8 +43,11 @@ export default class App extends React.Component {
     if (view) {
       this.setState({view: view})
     }
-    if (groupByName) {
+    if (groupByName !== undefined) {
       this.setState({groupByName: groupByName})
+    }
+    if (sortBy) {
+      this.setState({sortBy: sortBy})
     }
   }
 
@@ -74,10 +79,10 @@ export default class App extends React.Component {
     }
     return (
       <div className='appContainer'>
-
-          <Bar settings={this.state} onAppChange = {this.handleAppChange} />
+        <Paper>
+          <header><Bar settings={this.state} onAppChange = {this.handleAppChange} /></header>
           <Lib library = {library} settings={this.state} />
-
+        </Paper>
       </div>
     )
   }

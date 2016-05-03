@@ -1,5 +1,9 @@
 'use strict'
+import React from 'react'
 import Path from 'path'
+import BookIcon from 'material-ui/svg-icons/action/book'
+import BubbleIcon from 'material-ui/svg-icons/communication/chat-bubble'
+// import PDFIcon from 'material-ui/svg-icons/image/picture-as-pdf'
 
 export default class Book {
   constructor (data) {
@@ -39,6 +43,18 @@ export default class Book {
         return this.author
       case 'comic':
         return this.name
+      default:
+        return 'unknown book'
+    }
+  }
+  get icon () {
+    switch (this.type) {
+      case 'ebook':
+        return <BookIcon/>
+      case 'pdf':
+        return <BookIcon/>
+      case 'comic':
+        return <BubbleIcon/>
       default:
         return 'unknown book'
     }

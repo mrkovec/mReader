@@ -11,6 +11,7 @@ export default class Library {
     this.sortfnc = null
     this.filterfnc = null
     this.filterfnc2 = null
+    this.searchText = null
   }
   // updateBook (data) {
   //   console.log(data)
@@ -51,6 +52,10 @@ export default class Library {
     this.changed = true
     this.groupfnc = fnc
   }
+  search (text) {
+    console.log(text)
+    this.searchText = text
+  }
   get books () {
     if (!this.changed) {
       return this.temp
@@ -65,6 +70,11 @@ export default class Library {
     }
     if (this.filterfnc2) {
       books = books.filter(this.filterfnc2)
+    }
+    if (this.searchText !== '@@@') {
+      books = books.filter((b) => {
+        return `${b.fname}${b.sname}`.toLowerCase().includes(this.searchText.toLowerCase())
+      })
     }
     if (this.sortfnc) {
       books.sort(this.sortfnc)
