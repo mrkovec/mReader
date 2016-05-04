@@ -57,7 +57,7 @@ export function OpenEbook (book) {
 }
 
 export function ParseEbook (book) {
-  return ListFromArchive(book.fullPath, '-i!content.opf').then((files) => {
+  return ListFromArchive(book.fullPath, '-i!*.opf').then((files) => {
     let opf = files[0]
     return ExtractFromArchive(book.fullPath, Path.basename(opf), 'x').then(() => {
       return ReadFile(opf).then((xml) => {

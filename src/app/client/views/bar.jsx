@@ -12,6 +12,8 @@ import Download from 'material-ui/svg-icons/action/info-outline'
 import Exit from 'material-ui/svg-icons/action/exit-to-app'
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 import MenuIcon from 'material-ui/svg-icons/navigation/menu'
+// import Dialog from 'material-ui/lib/dialog'
+const dialog = require('electron').remote.dialog
 
 export default class Bar extends React.Component {
   constructor (props) {
@@ -22,6 +24,13 @@ export default class Bar extends React.Component {
     this.handleSearch = this.handleSearch.bind(this)
     this.handleSortBy = this.handleSortBy.bind(this)
     this.handleAbout = this.handleAbout.bind(this)
+  }
+  handleAdd () {
+    dialog.showOpenDialog({properties: ['openDirectory']}, (path) => {
+      if (path) {
+        IpcRenderer.send('library', {type: 'add', path: path[0]})
+      }
+    })
   }
   handleAbout () {
     this.props.onAppChange({view: 'about'})

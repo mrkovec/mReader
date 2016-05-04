@@ -4,6 +4,24 @@ import {ComicExt, BookExt} from './../../conf'
 import {ReadFile, ListFiles, WriteFile} from './util'
 import {Book} from './book'
 
+export function AddLibrary (path) {
+  console.log(path)
+  let libpath = Path.join(global.DataPath, 'lib.json')
+  return ReadFile(libpath).then((libs) => {
+    if (libs) {
+      libs = JSON.parse(libs)
+      if (!libs.includes(path)) {
+        libs = libs.concat(path)
+      }
+    } else {
+      libs = [path]
+    }
+    return WriteFile(libpath, JSON.stringify(libs)).then(() => {
+      return SyncLibrary()
+    })
+  })
+}
+
 export function UpdateLibrary (book) {
   return SyncLibrary().then((lib) => {
     let i = -1
@@ -42,6 +60,9 @@ export function ClearLibrary () {
 export function SyncLibrary () {
   let allbooks = []
   return ReadFile(Path.join(global.DataPath, 'lib.json')).then((libs) => {
+    if (!libs) {
+      return []
+    }
     let libpromises = JSON.parse(libs).map((libdir) => {
       let bookpromises = ListFiles(libdir, null, (f) => { return `${BookExt}${ComicExt}`.indexOf(Path.extname(f)) >= 0 }).map((file) => {
         // // console.log(libdir, file)

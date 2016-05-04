@@ -74,7 +74,7 @@ export default class Ebook extends React.Component {
     let {book} = this.props
     this.book = book
     // let index = book.kap.map((k, i, arr) => {
-    //   return (<li><a href={`#${i + 1}`} >{k.title}</a></li>)
+    //   return (<li><a href={`#${i + 1}`} >{`chapter ${k.text}`}{k.title}</a></li>)
     // })
     // console.log(this.state)
     let pages = book.kap.map((k, i) => {

@@ -5,7 +5,7 @@ import BrowserWindow from 'browser-window'
 import Path from 'path'
 import {PrintErr, WriteFile} from './scripts/util'
 import {SetAppPath, SetDataPath, SetTempPath} from './../conf.js'
-import {SyncLibrary, ClearLibrary, UpdateLibrary} from './scripts/library'
+import {SyncLibrary, ClearLibrary, UpdateLibrary, AddLibrary} from './scripts/library'
 import {Book} from './scripts/book'
 
 let mainWindow = null
@@ -31,7 +31,7 @@ App.on('ready', () => {
 
   mountIPC()
 
-  mainWindow = new BrowserWindow({width: 1000, height: 600, title: global.AppSettings.name})
+  mainWindow = new BrowserWindow({width: 800, height: 600, title: global.AppSettings.name})
   mainWindow.setMenu(null)
   mainWindow.loadURL(`file://${global.AppPath}/src/app/client/index.html`)
   // mainWindow.webContents.openDevTools()
@@ -46,7 +46,7 @@ function mountIPC () {
   })
 
   IpcMain.on('library', (event, arg) => {
-    let {type, book} = arg
+    let {type, book, path} = arg
     // // console.log(type)
     // // console.log(book)
     switch (type) {
@@ -85,8 +85,16 @@ function mountIPC () {
           sendResponse(event.sender, {error: err})
         })
         break
+      case 'add':
+        AddLibrary(path).then((res) => {
+          sendResponse(event.sender, {library: res})
+        }).catch((err) => {
+          PrintErr(err, 'IpcMain.on library add')
+          sendResponse(event.sender, {error: err})
+        })
+        break
       default:
-        // console.log(`unknown msg type ${type} in ${arg}`)
+        console.error(`unknown msg type ${type} in ${arg}`)
     }
   })
   IpcMain.on('book', (event, arg) => {
@@ -104,7 +112,7 @@ function mountIPC () {
         })
         break
       default:
-        // console.log(`unknown msg type ${type} in ${arg}`)
+        console.error(`unknown msg type ${type} in ${arg}`)
     }
   })
   IpcMain.on('settings', (event, set) => {
