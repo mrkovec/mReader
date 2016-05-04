@@ -4,7 +4,7 @@ import Path from 'path'
 import Exec from 'child_process'
 import xml2js from 'xml2js'
 
-import {TempPath} from './../../conf'
+// import {TempPath, AppSettings} from './../../conf'
 
 export function CreateDir (dir) {
   return new Promise(function (resolve, reject) {
@@ -43,16 +43,17 @@ export function ListFromArchive (archfile, ipar = '') {
     let regex = /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) ([\.D][\.R][\.H][\.S][\.A]) +(\d+) +(\d+)? +(.+)/
     let list = []
     // exec.exec(`7z l "${file}" -r -i!content.opf -i!*.html -i!*.xhtml`, {encoding: 'utf8'}, (error, stdout, stderr) => {
-    Exec.exec(`7z l "${archfile}" -r ${ipar}`, {encoding: 'utf8'}, (err, stdout, stderr) => {
+    let p = Path.join(global.AppSettings.path7z, '7z')
+    Exec.exec(`"${p}" l "${archfile}" -r ${ipar}`, {encoding: 'utf8'}, (err, stdout, stderr) => {
       if (err) {
-        console.log(`ListFromArchive (${archfile}, ${ipar}) = ${err}`)
+        // console.log(`ListFromArchive (${archfile}, ${ipar}) = ${err}`)
         reject(new Error(err))
       }
       stdout.split('\n').forEach((line) => {
         let info = line.match(regex)
         if (info) {
-          // console.log(info)
-          list = list.concat(Path.join(TempPath, Path.basename(archfile), info[5]))
+          // // console.log(info)
+          list = list.concat(Path.join(global.TempPath, Path.basename(archfile), info[5]))
         }
       })
       resolve(list.sort())
@@ -62,12 +63,13 @@ export function ListFromArchive (archfile, ipar = '') {
 
 export function ExtractFromArchive (archfile, file, pr = 'e', out) {
   if (!out) {
-    out = Path.join(TempPath, Path.basename(archfile))
+    out = Path.join(global.TempPath, Path.basename(archfile))
   }
   return new Promise(function (resolve, reject) {
-    Exec.exec(`7z ${pr} "${archfile}" -o"${out}" "${Path.basename(file)}" -r -y`, (err) => {
+    let p = Path.join(global.AppSettings.path7z, '7z')
+    Exec.exec(`${p} ${pr} "${archfile}" -o"${out}" "${Path.basename(file)}" -r -y`, (err) => {
       if (err) {
-        console.log(`ExtractFromArchive (${archfile}, ${file}, ${pr}, ${out}) = ${err}`)
+        // console.log(`ExtractFromArchive (${archfile}, ${file}, ${pr}, ${out}) = ${err}`)
         reject(new Error(err))
       } else {
         resolve(`${archfile} extracted`)
@@ -83,7 +85,7 @@ export function ReadFile (path) {
         if (err.code === 'ENOENT') {
           resolve(null)
         } else {
-          console.log(`ReadFile (${path}) = ${err}`)
+          // console.log(`ReadFile (${path}) = ${err}`)
           reject(new Error(err))
         }
       } else {
@@ -97,7 +99,7 @@ export function WriteFile (path, data) {
   return new Promise((resolve, reject) => {
     Fs.writeFile(path, data, 'utf8', 'w', (err) => {
       if (err) {
-        console.log(`WriteFile (${path}) = ${err}`)
+        // console.log(`WriteFile (${path}) = ${err}`)
         reject(new Error(err))
       } else {
         resolve(`${path} file writed`)

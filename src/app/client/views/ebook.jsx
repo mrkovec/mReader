@@ -1,7 +1,7 @@
 import React from 'react'
 import IpcRenderer from 'ipc-renderer'
 import Path from 'path'
-import WebFrame from 'web-frame'
+// import WebFrame from 'web-frame'
 import Book from './../scripts/book'
 
 import IconButton from 'material-ui/IconButton/IconButton'
@@ -55,14 +55,14 @@ export default class Ebook extends React.Component {
     }, 0)
 
     // window.addEventListener('resize', function (event) {
-    //   console.log(book.info.readOffset)
-    //   console.log(document.body.scrollHeight)
-    //   console.log(document.body.offsetHeight)
+    //   // console.log(book.info.readOffset)
+    //   // console.log(document.body.scrollHeight)
+    //   // console.log(document.body.offsetHeight)
     //
-    //   console.log(document.documentElement.clientHeight)
-    //   console.log(document.documentElement.offsetHeight)
+    //   // console.log(document.documentElement.clientHeight)
+    //   // console.log(document.documentElement.offsetHeight)
     //
-    //   // console.log((book.info.readOffset / 100.0) * document.body.scrollHeight)
+    //   // // console.log((book.info.readOffset / 100.0) * document.body.scrollHeight)
     //   setTimeout(function () {
     //     window.requestAnimationFrame(() => {
     //       document.body.scrollTop = Math.floor((book.info.readOffset / 100) * document.body.scrollHeight)
@@ -76,7 +76,7 @@ export default class Ebook extends React.Component {
     // let index = book.kap.map((k, i, arr) => {
     //   return (<li><a href={`#${i + 1}`} >{k.title}</a></li>)
     // })
-    console.log(this.state)
+    // console.log(this.state)
     let pages = book.kap.map((k, i) => {
       return (<Page key={i} src={`${k.text}`} head={k.head} root={book.body[i]} pgn={i + 1}
         font={this.state.font} zoom={this.state.zoom}/>)
@@ -181,12 +181,12 @@ Page.propTypes = {
 //   let body = document.body
 //   let html = document.documentElement
 //
-//   // console.log('body.scrollHeight ' + body.scrollHeight)
+//   // // console.log('body.scrollHeight ' + body.scrollHeight)
+//   // // console.log('window.innerHeight ' + window.innerHeight)
+//   // // console.log('body.scrollTop ' + body.scrollTop)
+//   // console.log('body.scrollBottom ' + (body.scrollTop + window.innerHeight))
+//   // // console.log('html.clientHeight ' + html.clientHeight)
 //   // console.log('window.innerHeight ' + window.innerHeight)
-//   // console.log('body.scrollTop ' + body.scrollTop)
-//   console.log('body.scrollBottom ' + (body.scrollTop + window.innerHeight))
-//   // console.log('html.clientHeight ' + html.clientHeight)
-//   console.log('window.innerHeight ' + window.innerHeight)
 // }
 
 // function strip (html) {
@@ -194,7 +194,7 @@ Page.propTypes = {
 //   try {
 //     tmp.innerHTML = html
 //   } catch (err) {
-//     console.log(err)
+//     // console.log(err)
 //   }
 //   return tmp.textContent || tmp.innerText || ''
 // }

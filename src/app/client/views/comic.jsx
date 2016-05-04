@@ -30,7 +30,7 @@ export default class Comic extends React.Component {
     this.props.book.info.readOffset = 100.0 * (document.body.scrollTop / document.body.scrollHeight)
     this.props.book.info.zoom = this.state.zoom
     this.props.book.info.read = new Date()
-    console.log(this.props.book.info.read)
+    // console.log(this.props.book.info.read)
     IpcRenderer.send('library', {type: 'update', book: this.props.book})
     this.props.onAppChange({view: 'library'})
   }
@@ -45,7 +45,7 @@ export default class Comic extends React.Component {
   }
   render () {
     let {book} = this.props
-    // console.log(book)
+    // // console.log(book)
     let pages = book.body.map((k, i) => {
       return (<Page key={i} src={`${k}`} pgn={i + 1} zoom={this.state.zoom}/>)
     })

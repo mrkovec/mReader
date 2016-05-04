@@ -4,13 +4,15 @@ import Lib from './lib'
 import Ebook from './ebook'
 import Comic from './comic'
 import Pdf from './pdf'
-
+import About from './about'
 import Book from './../scripts/book'
-
-import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import Paper from 'material-ui/Paper'
+// import ColorManipulator from 'material-ui/utils/colorManipulator'
+// let ColorManipulator = require('material-ui/utils/colorManipulator')
+// import {darkBlack, fullBlack, white, grey500, grey300, cyan500} from 'material-ui/styles/colors'
 // import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme'
+import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme'
 // import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 export default class App extends React.Component {
@@ -26,7 +28,29 @@ export default class App extends React.Component {
     this.handleAppChange = this.handleAppChange.bind(this)
   }
   getChildContext () {
-    return { muiTheme: getMuiTheme(baseTheme) }
+    // return {
+    //   muiTheme: getMuiTheme({
+    //     palette: {
+    //       primary1Color: '#558B2F',
+    //       primary2Color: '#845998',
+    //       primary3Color: '#682DBE',
+    //       accent1Color: '#2DBE4F',
+    //       accent2Color: '#B2F1C0',
+    //       accent3Color: grey500,
+    //       textColor: darkBlack,
+    //       alternateTextColor: white,
+    //       canvasColor: white,
+    //       borderColor: grey300,
+    //       disabledColor: ColorManipulator.fade(darkBlack, 0.3),
+    //       pickerHeaderColor: cyan500,
+    //       clockCircleColor: ColorManipulator.fade(darkBlack, 0.07),
+    //       shadowColor: fullBlack
+    //     }
+    //   })
+    // }
+    return {
+      muiTheme: getMuiTheme(baseTheme)
+    }
   }
 
   handleAppChange (changed) {
@@ -76,6 +100,12 @@ export default class App extends React.Component {
           )
         default:
       }
+    } else if (this.state.view === 'about') {
+      return (
+        <div className='appContainer'>
+          <About onAppChange = {this.handleAppChange}/>
+        </div>
+      )
     }
     return (
       <div className='appContainer'>

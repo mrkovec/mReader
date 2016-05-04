@@ -34,10 +34,10 @@ export default class Lib extends React.Component {
     switch (sortBy) {
       case 'name':
         library.sortBy((a, b) => {
-          if (a.name < b.name) {
+          if (a.printname < b.printname) {
             return -1
           }
-          if (a.name > b.name) {
+          if (a.printname > b.printname) {
             return 1
           }
           return 0
@@ -56,7 +56,7 @@ export default class Lib extends React.Component {
         break
       case 'read':
         library.sortBy((a, b) => {
-          console.log(a.info.read + '-' + b.info.read)
+          // console.log(a.info.read + '-' + b.info.read)
           if (!a.info.read & !b.info.read) {
             return 0
           }
@@ -80,11 +80,12 @@ export default class Lib extends React.Component {
     }
     library.groupBy(null)
     if (groupByName) {
-      library.groupBy((b) => { return b.sname })
+      library.groupBy((b) => { return b.groupname })
     }
     library.search(search)
 
     library = library.books
+    // console.log(library)
     let lib = 'no books found'
     if (library.length > 0) {
       lib = library.map((book, i) => {

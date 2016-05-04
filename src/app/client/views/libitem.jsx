@@ -36,7 +36,9 @@ export default class LibItem extends React.Component {
     IpcRenderer.send('book', {type: 'open', msg: msg})
   }
   renderBook (book, i) {
-    if (book.type === 'pdf' & (!book.author)) {
+    // // console.log('renderbook')
+    // // console.log(book)
+    if (book.type === 'pdf' & (!book.author) & (!book.nested)) {
       GetPDFinfo(book).then((b) => {
         book.author = 'unknown'
         if (b.info.Author) {
@@ -45,10 +47,10 @@ export default class LibItem extends React.Component {
         if (b.info.Title) {
           book.name = b.info.Title
         }
-        // console.log(book)
+        // // console.log(book)
         IpcRenderer.send('library', {type: 'update', book: book})
       }).catch((err) => {
-        console.log(err)
+        // console.log(err)
       })
     }
     if (book.nested) {
@@ -56,14 +58,14 @@ export default class LibItem extends React.Component {
         return this.renderBook(b, i)
       })
       return (
-        <div>
-          <ListItem leftIcon={<FolderIcon/>} primaryText={<p>{book.fname} <span style={{color: lightBlack}}>{book.sname}</span></p>} nestedItems={sub}/>
+        <div style={{borderBottom: 'medium solid #eeeeee'}}>
+          <ListItem leftIcon={<FolderIcon/>} primaryText={<p>{book.printname} <span style={{color: lightBlack}}>{book.printauthor}</span></p>} nestedItems={sub}/>
         </div>
       )
     }
     return (
-      <div key={i ? i : null}>
-        <ListItem leftIcon={book.icon} primaryText={<p>{book.fname} <span style={{color: lightBlack}}>{book.sname}</span></p>} onTouchTap={() => this.onBookOpen(i)}
+      <div key={i ? i : null} style={{borderBottom: 'medium solid #eeeeee'}}>
+        <ListItem leftIcon={book.icon} primaryText={<p>{book.printname} <span style={{color: lightBlack}}>{book.printauthor}</span></p>} onTouchTap={() => this.onBookOpen(i)}
         rightIconButton={
           <IconMenu
             iconButtonElement={<IconButton touch={true}><MoreVertIcon /></IconButton>}

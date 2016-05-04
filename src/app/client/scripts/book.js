@@ -21,21 +21,31 @@ export default class Book {
       this.kap = kap
     }
   }
-
-  get fname () {
+  get printname () {
     switch (this.type) {
       case 'ebook':
         return this.name
       case 'pdf':
         return this.name
       case 'comic':
-        return this.issue
+        return this.issue ? `${this.name} ${this.issue}` : this.name
       default:
         return 'unknown book'
     }
   }
-
-  get sname () {
+  get printauthor () {
+    switch (this.type) {
+      case 'ebook':
+        return this.author
+      case 'pdf':
+        return this.author
+      case 'comic':
+        return this.author
+      default:
+        return 'unknown book'
+    }
+  }
+  get groupname () {
     switch (this.type) {
       case 'ebook':
         return this.author
@@ -62,7 +72,6 @@ export default class Book {
   get fullPath () {
     return Path.join(this.libpath, this.relpath, this.file)
   }
-
   get unread () {
     return (this.info.readOffset < 99)
   }
@@ -72,5 +81,4 @@ export default class Book {
   get inprogress () {
     return (this.info.readOffset > 0) & (this.info.readOffset <= 99)
   }
-
 }

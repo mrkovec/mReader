@@ -1,28 +1,40 @@
 'use strict'
-
 import App from 'app'
 import IpcMain from 'ipc-main'
 import BrowserWindow from 'browser-window'
-
+import Path from 'path'
+import {PrintErr, WriteFile} from './scripts/util'
+import {SetAppPath, SetDataPath, SetTempPath} from './../conf.js'
 import {SyncLibrary, ClearLibrary, UpdateLibrary} from './scripts/library'
 import {Book} from './scripts/book'
-import {PrintErr} from './scripts/util'
 
 let mainWindow = null
+
+App.on('quit', () => {
+  // // console.log(global.AppSettings)
+  // WriteFile(`${global.AppPath}/src/app/settings.json`, JSON.stringify(global.AppSettings)).catch((err) => {
+  //   PrintErr(err, 'settings')
+  // }).then((a) => {
+  //   // console.log(a)
+  // })
+})
 
 App.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     App.quit()
   }
 })
-
 App.on('ready', () => {
+  SetAppPath(App.getAppPath())
+  SetDataPath(App.getPath('userData'))
+  SetTempPath(Path.join(App.getPath('temp'), 'mReader'))
+
   mountIPC()
 
-  mainWindow = new BrowserWindow({width: 1000, height: 600})
-  mainWindow.loadURL(`file://${App.getAppPath()}/src/app/client/index.html`)
+  mainWindow = new BrowserWindow({width: 1000, height: 600, title: global.AppSettings.name})
   mainWindow.setMenu(null)
-  mainWindow.webContents.openDevTools()
+  mainWindow.loadURL(`file://${global.AppPath}/src/app/client/index.html`)
+  // mainWindow.webContents.openDevTools()
   mainWindow.on('closed', () => {
     mainWindow = null
   })
@@ -35,12 +47,22 @@ function mountIPC () {
 
   IpcMain.on('library', (event, arg) => {
     let {type, book} = arg
-    // console.log(type)
-    // console.log(book)
+    // // console.log(type)
+    // // console.log(book)
     switch (type) {
       case 'sync':
         SyncLibrary().then((res) => {
+          // if (global.AppSettings.lastOpenBook) {
+          //   let book = new Book(global.AppSettings.lastOpenBook)
+          //   book.open().then((resp) => {
+          //     sendResponse(event.sender, {book: global.AppSettings.lastOpenBook, library: res})
+          //   }).catch((err) => {
+          //     PrintErr(err, 'IpcMain.on book open')
+          //     sendResponse(event.sender, {error: err})
+          //   })
+          // } else {
           sendResponse(event.sender, {library: res, info: `library synced susesfully`})
+          // }
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on library sync')
           sendResponse(event.sender, {error: err})
@@ -56,7 +78,7 @@ function mountIPC () {
         break
       case 'update':
         UpdateLibrary(new Book(book)).then((res) => {
-          // console.log(res)
+          // // console.log(book.file)
           sendResponse(event.sender, {library: res})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on library update')
@@ -64,17 +86,17 @@ function mountIPC () {
         })
         break
       default:
-        console.log(`unknown msg type ${type} in ${arg}`)
+        // console.log(`unknown msg type ${type} in ${arg}`)
     }
   })
-
   IpcMain.on('book', (event, arg) => {
-    // console.log(arg)
+    // // console.log(arg)
     let {type, msg} = arg
     switch (type) {
       case 'open':
         let book = new Book(msg)
         book.open().then((resp) => {
+          // global.AppSettings.lastOpenBook = resp
           sendResponse(event.sender, {book: resp})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on book open')
@@ -82,20 +104,20 @@ function mountIPC () {
         })
         break
       default:
-        console.log(`unknown msg type ${type} in ${arg}`)
+        // console.log(`unknown msg type ${type} in ${arg}`)
     }
   })
-
-  IpcMain.on('readOffset', (event, arg) => {
-    let {offset, file} = arg
-    let book = new Book({file: file})
-    book.getInfo().then((info) => {
-      info.readOffset = offset
-      // console.log(info)
-      book.bookInfo = info
-    }).catch((err) => {
-      PrintErr(err, 'IpcMain.on readOffset getInfo')
+  IpcMain.on('settings', (event, set) => {
+    WriteFile(`${global.AppPath}/src/app/settings.json`, JSON.stringify(set)).catch((err) => {
+      PrintErr(err, 'settings')
+      sendResponse(event.sender, {error: err})
+    }).then((a) => {
+      // console.log(a)
     })
+  })
+  IpcMain.on('quit', () => {
+    // global.AppSettings.lastOpenBook = null
+    App.quit()
   })
 }
 

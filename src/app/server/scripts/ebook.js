@@ -83,6 +83,7 @@ export function ParseEbook (book) {
 }
 
 export function ParsePDF (book) {
+  // // console.log(book)
   return CreateDir(book.dataPath).then(() => {
     book.info = {added: (new Date()), readOffset: 0}
     return WriteFile(Path.join(book.dataPath, 'book.info'), JSON.stringify(book)).then(() => {

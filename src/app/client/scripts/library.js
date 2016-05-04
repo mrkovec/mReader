@@ -14,7 +14,7 @@ export default class Library {
     this.searchText = null
   }
   // updateBook (data) {
-  //   console.log(data)
+  //   // console.log(data)
   //   let {book, info, author, name} = data
   //   let i = -1
   //   this.data.forEach((b, k) => {
@@ -28,9 +28,9 @@ export default class Library {
   //
   //   }
   //   if (author) {
-  //     console.log(this.data[i].author)
+  //     // console.log(this.data[i].author)
   //     this.data[i].author = author
-  //     console.log(this.data[i].author)
+  //     // console.log(this.data[i].author)
   //   }
   //   if (name) {
   //
@@ -53,7 +53,7 @@ export default class Library {
     this.groupfnc = fnc
   }
   search (text) {
-    console.log(text)
+    // // console.log(text)
     this.searchText = text
   }
   get books () {
@@ -64,7 +64,7 @@ export default class Library {
     // this.filterfnc.forEach((f) => {
       // books = books.filer(f)
     // })
-    // console.log(this.filterfnc)
+    // // console.log(this.filterfnc)
     if (this.filterfnc) {
       books = books.filter(this.filterfnc)
     }

@@ -1,7 +1,10 @@
 import React from 'react'
 import IpcRenderer from 'ipc-renderer'
-import WebFrame from 'web-frame'
+// import WebFrame from 'web-frame'
+import Path from 'path'
 import Book from './../scripts/book'
+// import {AppPath} from './../../conf.js'
+import Remote from 'remote'
 // import {Lib} from './../main'
 import IconButton from 'material-ui/IconButton/IconButton'
 import ActionHome from 'material-ui/svg-icons/action/home'
@@ -48,11 +51,11 @@ export default class Pdf extends React.Component {
   }
   setPDF () {
     let pdfbook = this
-    PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
+    PDFJS.workerSrc = Path.join(Remote.getGlobal('AppPath'), '/node_modules/pdfjs-dist/build/pdf.worker.js')
     PDFJS.getDocument(this.props.book.fullPath).then(function (pdf) {
       pdfbook.setState({pdf: pdf})
     }).catch((err) => {
-      console.log(err)
+      // console.log(err)
     })
   }
   render () {
@@ -112,12 +115,12 @@ class Page extends React.Component {
     this.componentDidMount = this.componentDidMount.bind(this)
   }
   componentWillUpdate (nextProps, nextState) {
-    // console.log(nextProps)
-    // console.log(nextState)
+    // // console.log(nextProps)
+    // // console.log(nextState)
     if (nextState.page) {
       let viewport = nextState.page.getViewport(1)
       let scale = window.innerWidth / viewport.width
-      console.log(scale + ' ' + nextProps.zoom / 100)
+      // console.log(scale + ' ' + nextProps.zoom / 100)
       viewport = nextState.page.getViewport(scale * nextProps.zoom / 100)
       let canvas = document.getElementById(`canvas${nextProps.pgn}`)
       let context = canvas.getContext('2d')
@@ -134,7 +137,7 @@ class Page extends React.Component {
   componentDidMount () {
     let pdfpage = this
     this.props.book.getPage(this.props.pgn).then(function (page) {
-      console.log(page)
+      // console.log(page)
       pdfpage.setState({page: page})
     })
   }
@@ -153,7 +156,8 @@ Page.propTypes = {
 }
 
 export function GetPDFinfo (book) {
-  PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
+  // PDFJS.workerSrc = 'c:/mmr/rozne/electron/worspace/reader/node_modules/pdfjs-dist/build/pdf.worker.js'
+  PDFJS.workerSrc = Path.join(Remote.getGlobal('AppPath'), '/node_modules/pdfjs-dist/build/pdf.worker.js')
   return PDFJS.getDocument(book.fullPath).then(function (pdf) {
     return pdf.getMetadata()
   })

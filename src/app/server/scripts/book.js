@@ -1,8 +1,8 @@
 'use strict'
 import Path from 'path'
 import Fs from 'fs'
-import {TempPath, ComicExt, BookExt} from './../../conf'
-import {ReadFile, WriteFile, ListFiles, DeleteFile, ExistsFile, ExtractFromArchive} from './util'
+import {ComicExt, BookExt} from './../../conf'
+import {ReadFile, ListFiles, DeleteFile, ExistsFile, ExtractFromArchive} from './util'
 import {ParseEbook, OpenEbook, ParsePDF} from './ebook'
 import {ParseComic} from './comic'
 
@@ -28,7 +28,7 @@ export class Book {
     return Path.join(this.libpath, this.relpath, this.file)
   }
   get dataPath () {
-    return Path.join(TempPath, Path.basename(this.file))
+    return Path.join(global.TempPath, Path.basename(this.file))
   }
   parse (dir, file) {
     dir = Path.normalize(dir)
@@ -59,8 +59,8 @@ export class Book {
       this.relpath = Path.dirname(Path.relative(dir, file))
       this.body = []
       this.info = null
-      console.log('parse')
-      // console.log(this)
+      // console.log('parse')
+      // // console.log(this)
       switch (this.type) {
         case 'ebook':
           return ParseEbook(this)

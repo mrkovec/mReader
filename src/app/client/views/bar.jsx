@@ -21,6 +21,10 @@ export default class Bar extends React.Component {
     this.handleGroupByName = this.handleGroupByName.bind(this)
     this.handleSearch = this.handleSearch.bind(this)
     this.handleSortBy = this.handleSortBy.bind(this)
+    this.handleAbout = this.handleAbout.bind(this)
+  }
+  handleAbout () {
+    this.props.onAppChange({view: 'about'})
   }
   handleSync () {
     IpcRenderer.send('library', {type: 'sync'})
