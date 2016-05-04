@@ -2,7 +2,7 @@
 
 Comics and ebook reader for windows/linux/osx powered by [Electron](http://electron.atom.io/) and [React](https://facebook.github.io/react/).
 
-[[https://github.com/mrkovec/mReader/raw/master/screenshot.gif|alt=mReader_screenshot]]
+![Alt text](https://github.com/mrkovec/mReader/raw/master/screenshot.gif "mReader screenshot")
 
 ## Suported formats (for now)
 
