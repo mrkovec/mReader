@@ -2,6 +2,8 @@
 
 Comics and ebook reader for windows/linux/osx powered by [Electron](http://electron.atom.io/) and [React](https://facebook.github.io/react/).
 
+[[https://github.com/mrkovec/mReader/raw/master/screenshot.gif|alt=mReader_screenshot]]
+
 ## Suported formats (for now)
 
 - .cbr
