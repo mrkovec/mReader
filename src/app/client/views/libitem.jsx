@@ -19,12 +19,19 @@ export default class LibItem extends React.Component {
     this.renderBook = this.renderBook.bind(this)
     this.markAs = this.markAs.bind(this)
   }
-  markAs (as) {
-    this.props.book.info.readOffset = 0
-    if (as) {
-      this.props.book.info.readOffset = 100
+  markAs (as, i) {
+    let msg = {}
+    if (i === undefined) {
+      msg = this.props.book
+    } else {
+      msg = this.props.book.nested[i]
     }
-    IpcRenderer.send('library', {type: 'update', book: this.props.book})
+    msg.info.readOffset = 0
+    if (as) {
+      msg.info.readOffset = 100
+      IpcRenderer.send('book', {type: 'clear', msg: msg})
+    }
+    IpcRenderer.send('library', {type: 'update', book: msg})
   }
   onBookOpen (i) {
     let msg = {}
@@ -70,8 +77,8 @@ export default class LibItem extends React.Component {
           <IconMenu
             iconButtonElement={<IconButton touch={true}><MoreVertIcon /></IconButton>}
           >
-            <MenuItem primaryText='mark as read' onTouchTap={() => { this.markAs(1) }} />
-            <MenuItem primaryText='mark as unread' onTouchTap={() => { this.markAs(0) }} />
+            <MenuItem primaryText='mark as read' onTouchTap={() => { this.markAs(1, i) }} />
+            <MenuItem primaryText='mark as unread' onTouchTap={() => { this.markAs(0, i) }} />
           </IconMenu>
         }
         />

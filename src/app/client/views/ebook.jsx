@@ -43,7 +43,7 @@ export default class Ebook extends React.Component {
     this.props.book.info.font = this.state.font
     this.props.book.info.read = new Date()
     IpcRenderer.send('library', {type: 'update', book: this.props.book})
-    this.props.onAppChange({view: 'library'})
+    // this.props.onAppChange({view: 'library'})
   }
   componentDidMount () {
     let book = this.book

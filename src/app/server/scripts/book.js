@@ -76,7 +76,7 @@ export class Book {
   clear () {
     // let tmpdir = Path.join(TempPath, Path.basename(this.file))
     return ExistsFile(this.dataPath).then(() => {
-      return Promise.all(ListFiles(this.dataPath, null, (f) => { return Path.basename(f) !== 'nfo.json' }).map((file) => {
+      return Promise.all(ListFiles(this.dataPath, null, (f) => { return Path.basename(f) !== 'book.info' }).map((file) => {
         return DeleteFile(file)
       }))
     }).catch(() => { return 'ok' })

@@ -9,7 +9,7 @@ import {SyncLibrary, ClearLibrary, UpdateLibrary, AddLibrary} from './scripts/li
 import {Book} from './scripts/book'
 
 let mainWindow = null
-
+// let webContents = null
 App.on('quit', () => {
   // // console.log(global.AppSettings)
   // WriteFile(`${global.AppPath}/src/app/settings.json`, JSON.stringify(global.AppSettings)).catch((err) => {
@@ -35,6 +35,7 @@ App.on('ready', () => {
   mainWindow.setMenu(null)
   mainWindow.loadURL(`file://${global.AppPath}/src/app/client/index.html`)
   // mainWindow.webContents.openDevTools()
+  // webContents = mainWindow.webContents
   mainWindow.on('closed', () => {
     mainWindow = null
   })
@@ -70,7 +71,7 @@ function mountIPC () {
         break
       case 'clear':
         ClearLibrary().then(() => {
-          sendResponse(event.sender, {info: `library cleared`})
+          sendResponse(event.sender, {library: [], info: `library cleared`})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on library clear')
           sendResponse(event.sender, {error: err})
@@ -78,7 +79,6 @@ function mountIPC () {
         break
       case 'update':
         UpdateLibrary(new Book(book)).then((res) => {
-          // // console.log(book.file)
           sendResponse(event.sender, {library: res})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on library update')
@@ -100,11 +100,19 @@ function mountIPC () {
   IpcMain.on('book', (event, arg) => {
     // // console.log(arg)
     let {type, msg} = arg
+    let book = new Book(msg)
     switch (type) {
       case 'open':
-        let book = new Book(msg)
         book.open().then((resp) => {
           // global.AppSettings.lastOpenBook = resp
+          sendResponse(event.sender, {book: resp})
+        }).catch((err) => {
+          PrintErr(err, 'IpcMain.on book open')
+          sendResponse(event.sender, {error: err})
+        })
+        break
+      case 'clear':
+        book.clear().then((resp) => {
           sendResponse(event.sender, {book: resp})
         }).catch((err) => {
           PrintErr(err, 'IpcMain.on book open')

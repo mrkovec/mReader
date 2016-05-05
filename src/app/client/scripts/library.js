@@ -73,7 +73,7 @@ export default class Library {
     }
     if (this.searchText !== '@@@') {
       books = books.filter((b) => {
-        return `${b.fname}${b.sname}`.toLowerCase().includes(this.searchText.toLowerCase())
+        return `${b.printname}${b.printauthor}`.toLowerCase().includes(this.searchText.toLowerCase())
       })
     }
     if (this.sortfnc) {

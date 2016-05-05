@@ -25,6 +25,12 @@ export default class Bar extends React.Component {
     this.handleSortBy = this.handleSortBy.bind(this)
     this.handleAbout = this.handleAbout.bind(this)
   }
+  handleClear () {
+    IpcRenderer.send('library', {type: 'clear'})
+  }
+  handleQuit () {
+    IpcRenderer.send('quit', {type: 'now'})
+  }
   handleAdd () {
     dialog.showOpenDialog({properties: ['openDirectory']}, (path) => {
       if (path) {
@@ -66,7 +72,7 @@ export default class Bar extends React.Component {
            <IconMenu iconButtonElement={<IconButton touch={true} tooltip={'menu'}><MenuIcon /></IconButton>} >
              <MenuItem primaryText='About' leftIcon={<Download />} onTouchTap={this.handleAbout} />
              <Divider />
-             <MenuItem value='Del' primaryText='Quit' leftIcon={<Exit />} />
+             <MenuItem primaryText='Quit' leftIcon={<Exit />} onTouchTap={this.handleQuit} />
             </IconMenu>
             <ToolbarTitle text='Library' />
             <DropDownMenu value={readState} onChange={this.handleReadStateChange}>
@@ -86,7 +92,7 @@ export default class Bar extends React.Component {
          <IconMenu iconButtonElement={<IconButton touch={true} tooltip={'more'}><MoreVertIcon /></IconButton>}>
            <MenuItem primaryText='Sync library' onTouchTap={this.handleSync} />
            <MenuItem primaryText='Add folder' onTouchTap={this.handleAdd} />
-           <MenuItem primaryText='Clear library' />
+           <MenuItem primaryText='Clear library' onTouchTap={this.handleClear} />
            <Divider/>
            <MenuItem primaryText='Group by name' checked={groupByName} onTouchTap={this.handleGroupByName} insetChildren={true} />
            <Divider/>

@@ -11,7 +11,7 @@ export function ParseComic (book) {
     let cb = book.file.match(comic_rx)
     if (cb) {
       book.name = cb[1]
-      book.issue = '#' + cb[2]
+      book.issue = `#${Number(cb[2])}`
     }
 
     if (!book.issue) {

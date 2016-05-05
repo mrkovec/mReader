@@ -36,6 +36,9 @@ export function UpdateLibrary (book) {
       lib[i].author = book.author
       lib[i].name = book.name
       lib[i].info.readOffset = book.info.readOffset
+      if (lib[i].info.readOffset >= 95) {
+        lib[i].clear()
+      }
       lib[i].info.zoom = book.info.zoom
       lib[i].info.font = book.info.font
       lib[i].info.read = book.info.read
@@ -48,6 +51,7 @@ export function UpdateLibrary (book) {
 }
 
 export function ClearLibrary () {
+  console.log('hu')
   return ReadFile(Path.join(global.DataPath, 'lib.json')).then((libs) => {
     return Promise.all(JSON.parse(libs).map((libdir) => {
       return Promise.all(ListFiles(libdir).map((file) => {
