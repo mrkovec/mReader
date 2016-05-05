@@ -23,5 +23,3 @@ npm start
 ```
 
 `7z` executable needs to be located in `./bin` folder or his path set in `menu > about > settings > path to 7z`.
-
-Start reading at (http://digitalcomicmuseum.com/) (http://www.feedbooks.com) (https://www.gutenberg.org)
