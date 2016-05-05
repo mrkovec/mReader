@@ -22,4 +22,4 @@ npm install
 npm start
 ```
 
-`7z` executable needs to be located in `./bin` folder or his path set in `menu > about > settings > path to 7z`.
+`7z` executable needs to be located in `./bin` folder or its path set in `menu > about > settings > path to 7z`.
