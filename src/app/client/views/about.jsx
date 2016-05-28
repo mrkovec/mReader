@@ -1,6 +1,8 @@
 import React from 'react'
-import IpcRenderer from 'ipc-renderer'
-import Remote from 'remote'
+import {ipcRenderer as IpcRenderer} from 'electron'
+
+import {remote as Remote} from 'electron'
+
 import {Tabs, Tab} from 'material-ui/Tabs'
 import ActionHome from 'material-ui/svg-icons/action/home'
 import Package from './../../../../package.json'

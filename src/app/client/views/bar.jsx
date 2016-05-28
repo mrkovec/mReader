@@ -1,5 +1,5 @@
 import React from 'react'
-import IpcRenderer from 'ipc-renderer'
+import {ipcRenderer as IpcRenderer} from 'electron'
 
 import DropDownMenu from 'material-ui/DropDownMenu'
 import {Toolbar, ToolbarGroup, ToolbarTitle} from 'material-ui/Toolbar'
@@ -13,7 +13,9 @@ import Exit from 'material-ui/svg-icons/action/exit-to-app'
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 import MenuIcon from 'material-ui/svg-icons/navigation/menu'
 // import Dialog from 'material-ui/lib/dialog'
-const dialog = require('electron').remote.dialog
+
+
+const {dialog} = require('electron').remote
 
 export default class Bar extends React.Component {
   constructor (props) {

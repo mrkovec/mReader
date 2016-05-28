@@ -1,6 +1,6 @@
 import React from 'react'
-import IpcRenderer from 'ipc-renderer'
-import WebFrame from 'web-frame'
+import {ipcRenderer as IpcRenderer} from 'electron'
+import {WebFrame} from 'electron'
 import Book from './../scripts/book'
 import IconButton from 'material-ui/IconButton/IconButton'
 import ActionHome from 'material-ui/svg-icons/action/home'

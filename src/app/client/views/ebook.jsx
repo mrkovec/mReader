@@ -1,5 +1,5 @@
 import React from 'react'
-import IpcRenderer from 'ipc-renderer'
+import {ipcRenderer as IpcRenderer} from 'electron'
 import Path from 'path'
 // import WebFrame from 'web-frame'
 import Book from './../scripts/book'

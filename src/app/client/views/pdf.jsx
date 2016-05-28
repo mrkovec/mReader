@@ -1,10 +1,11 @@
 import React from 'react'
-import IpcRenderer from 'ipc-renderer'
+import {ipcRenderer as IpcRenderer} from 'electron'
 // import WebFrame from 'web-frame'
+
 import Path from 'path'
 import Book from './../scripts/book'
 // import {AppPath} from './../../conf.js'
-import Remote from 'remote'
+import {remote as Remote} from 'electron'
 // import {Lib} from './../main'
 import IconButton from 'material-ui/IconButton/IconButton'
 import ActionHome from 'material-ui/svg-icons/action/home'

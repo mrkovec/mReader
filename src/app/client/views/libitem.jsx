@@ -1,5 +1,6 @@
 import React from 'react'
-import IpcRenderer from 'ipc-renderer'
+import {ipcRenderer as IpcRenderer} from 'electron'
+
 import Book from './../scripts/book'
 import {GetPDFinfo} from './pdf'
 import {ListItem} from 'material-ui/List'
