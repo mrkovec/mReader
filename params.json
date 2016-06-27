@@ -2,5 +2,5 @@
   "name": "mReader",
   "tagline": "Open source comic/ebook reader",
   "body": "# mReader\r\n\r\nComics and ebook reader for windows/linux/osx powered by [Electron](http://electron.atom.io/) and [React](https://facebook.github.io/react/).\r\n\r\n![Alt text](https://github.com/mrkovec/mReader/raw/master/screenshot.gif \"mReader screenshot\")\r\n\r\n## Suported formats (for now)\r\n\r\n- .cbr\r\n- .cbz\r\n- .epub\r\n- .pdf ([pdf.js](https://mozilla.github.io/pdf.js/))\r\n\r\n## Run instructions\r\n\r\nTo run **mReader** you'll need [Git](https://git-scm.com), [Node.js](https://nodejs.org/en/download/) and [7-zip](http://www.7-zip.org/download.html) installed. From command line:\r\n\r\n```bash\r\ngit clone https://github.com/mrkovec/mReader\r\ncd mReader\r\nnpm install\r\nnpm start\r\n```\r\n\r\n`7z` executable needs to be located in `./bin` folder or its path set in `menu > about > settings > path to 7z`.\r\n",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
+  "note": "Don't delete this file!  It's used internally to help with page regeneration."
 }
